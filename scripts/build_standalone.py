@@ -23,8 +23,8 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / 'artifact' / 'jein-site.html'
 OUT = ROOT / 'site'
 
-CONTACT_ENDPOINT = ''          # e.g. 'https://jein-contact.<your-subdomain>.workers.dev/api/contact'
-SITE_URL = 'https://YOUR-DOMAIN.com/'   # your public address, ending in "/"; used for canonical URLs, sitemap and share tags
+CONTACT_ENDPOINT = '/api/contact'   # the Vercel function in api/contact.mjs (same site, so no CORS); a Worker URL also works
+SITE_URL = 'https://jeinelekwa.com/'   # your public address, ending in "/"; used for canonical URLs, sitemap and share tags
 SHARE_IMAGE_APPROVED = True    # approved by Joshua on 19 October 2026; docs/share-preview.png is published as assets/share.png
 
 # page key (as in the artifact router) -> folder

@@ -58,6 +58,7 @@ with sync_playwright() as p:
 
     pg.goto(BASE + '/contact/#connect-media', wait_until='domcontentloaded'); pg.wait_for_timeout(700)
     check('/contact/#connect-media preselects the card', visible() == ['contact'] and pg.is_checked('#cx-path-media'))
+    check('with an endpoint set, no "sending isn\'t available" note', pg.evaluate('window.JEIN_CONTACT_ENDPOINT') == '/api/contact' and 'available' not in pg.inner_text('#cx-delivery'))
     pg.goto(BASE + '/community/', wait_until='domcontentloaded'); pg.wait_for_timeout(300)
     pg.click('[data-inquiry="community"]'); pg.wait_for_load_state('domcontentloaded'); pg.wait_for_timeout(800)
     check('Register interest moves to /contact/ with the card selected', pg.url.startswith(BASE + '/contact/') and pg.is_checked('#cx-path-community'), pg.url)

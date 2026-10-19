@@ -57,6 +57,39 @@ The site is one file with hash-routed pages. That works on any static host, with
 | Contact with a card preselected | `#connect-hire`, `#connect-collaborate`, `#connect-business`, `#connect-media`, `#connect-community`, `#connect-other` |
 | Privacy | `#privacy` |
 
+## Going live on Vercel (jeinelekwa.com)
+
+The repository is ready for Vercel:
+- `vercel.json` serves the prebuilt `site/` folder as-is: no build step, clean redirects, long caching for `assets/build/`.
+- `api/contact.mjs` is the contact form's server: HubSpot plus an email to jein.inc@gmail.com. It is a thin wrapper around the tested handler in `contact/server/`.
+
+1. **Import the project.** At vercel.com, sign in with GitHub. Choose **Add New → Project**, import `JElekwa/JEIN-WEBSITE` and click **Deploy**. Leave every setting as it is; `vercel.json` covers them.
+2. **Add the contact settings** under **Project → Settings → Environment Variables** (Production), then redeploy:
+   - `HUBSPOT_TOKEN` (HubSpot → Settings → Integrations → Private apps; scopes `crm.objects.contacts.read` and `crm.objects.contacts.write`)
+   - `RESEND_API_KEY` (resend.com → API Keys)
+   - `EMAIL_FROM` = `J.E.I.N. Website <contact@jeinelekwa.com>`
+   - `OWNER_EMAIL` = `jein.inc@gmail.com`
+   - `HUBSPOT_PORTAL_ID` = `247730038`
+   - `HUBSPOT_APP_HOST` = `app-na2.hubspot.com`
+   - `ALLOWED_ORIGINS` = `https://jeinelekwa.com,https://www.jeinelekwa.com`
+3. **Add the domain.** Under **Project → Settings → Domains**, add `jeinelekwa.com` and `www.jeinelekwa.com`. Set `www` to redirect to `jeinelekwa.com`.
+4. **Point Namecheap at Vercel.** In Namecheap, go to **Domain List → jeinelekwa.com → Manage → Advanced DNS**:
+   - Delete the parking records: the `CNAME www → parkingpage.namecheap.com` and any `URL Redirect` record on `@`.
+   - Add an `A` record: host `@`, value `76.76.21.21`.
+   - Add a `CNAME` record: host `www`, value `cname.vercel-dns.com`.
+   - If Vercel's Domains page shows different values, use Vercel's.
+   - Leave any MX or TXT email records alone.
+5. **Verify a sending domain in Resend.** Add `jeinelekwa.com` in Resend → Domains, then add the DNS records it lists in Namecheap's Advanced DNS. Until it's verified, emails can't be sent from `@jeinelekwa.com`.
+6. **Test it.** Visit https://jeinelekwa.com and send one test introduction. Check that the email arrives and the HubSpot contact and note appear, then delete the test contact in HubSpot.
+7. **Submit the sitemap.** In Google Search Console, add `jeinelekwa.com` and submit `https://jeinelekwa.com/sitemap.xml`.
+
+To update the live site afterwards:
+1. Edit `artifact/jein-site.html`.
+2. Run `python3 scripts/build_standalone.py`.
+3. Commit, then `git push`. Vercel redeploys automatically on every push to `main`.
+
+On Vercel there is no KV store, so rate limits and the 7-day duplicate record are off. A double-click is still sent once, because each submission has an id and Resend uses it as an idempotency key. For rate limiting later, add Upstash Redis.
+
 ## Publishing on Namecheap
 
 1. In `scripts/build_standalone.py`, set `SITE_URL` to your address (for example `https://jeinelekwa.com/`, with the trailing slash).

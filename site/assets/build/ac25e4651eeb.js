@@ -228,7 +228,7 @@
       }
     } catch(e){}
     backendReady = true;
-    if (!db || !uid || canWrite === false){
+    if (!window.JEIN_CONTACT_ENDPOINT && (!db || !uid || canWrite === false)){   // self-hosted builds send through the endpoint instead
       deliveryNote.innerHTML = '<b>Sending isn’t available in this view.</b> You can still write your introduction; it stays saved in this browser, and you can copy it at the end.';
     }
   })();

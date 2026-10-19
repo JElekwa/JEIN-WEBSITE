@@ -3,8 +3,8 @@
   "private": true,
   "description": "J.E.I.N. guided contact: shared logic, serverless endpoint and tests",
   "scripts": {
-    "test": "node --test tests/core.test.js tests/handler.test.mjs",
-    "test:ui": "python3 tests/ui_flow.py ../artifact/jein-site.html && python3 tests/pages_flow.py ../artifact/jein-site.html",
+    "test": "node --test tests/core.test.js tests/handler.test.mjs tests/vercel.test.mjs",
+    "test:ui": "python3 tests/ui_flow.py ../artifact/jein-site.html && python3 tests/pages_flow.py ../artifact/jein-site.html && python3 tests/build_flow.py ../site",
     "deploy": "cd server && npx wrangler deploy"
   }
 }

@@ -34,6 +34,10 @@ jein-website/
 │       ├── jein-mark.webp          favicon / mark
 │       ├── jein-lockup.webp        logo lockup
 │       └── jein-lockup-full.png    high-res lockup with "JOSHUA ELEKWA INTERACTIVE NETWORK"
+├── vercel.json                     Vercel: serve prebuilt site/ (no build), redirects, cache headers
+├── api/
+│   └── contact.mjs                 Vercel Function POST /api/contact → contact/server/handler.mjs (env vars hold secrets)
+├── LICENSE                         all rights reserved (the repo is public on GitHub)
 ├── scripts/
 │   └── build_standalone.py         artifact → site/: real pages per route, sitemap, robots, .htaccess (SITE_URL, CONTACT_ENDPOINT, SHARE_IMAGE_APPROVED)
 ├── contact/
@@ -47,7 +51,8 @@ jein-website/
 │       ├── handler.test.mjs        node:test, endpoint with mocked fetch/KV
 │       ├── ui_flow.py              Playwright, guided contact flow (78 checks)
 │       ├── pages_flow.py           Playwright, routing / links / case studies / search / analytics / mobile (174 checks)
-│       └── build_flow.py           Playwright over a local HTTP server: the multi-page site/ build (31 checks)
+│       ├── vercel.test.mjs         node:test, the Vercel function wrapper (2 tests)
+│       └── build_flow.py           Playwright over a local HTTP server: the multi-page site/ build (32 checks)
 └── docs/
     ├── contact-relay.md            HubSpot custom properties + hourly relay task
     └── briefs/                     01 portfolio, 02 journey, 03 contact briefs + original logo photo
@@ -75,13 +80,13 @@ python scripts/build_standalone.py
 
 # preview: open site/index.html in a browser (needs internet for Google Fonts)
 
-# unit + endpoint tests (23 tests)
-cd contact && node --test tests/core.test.js tests/handler.test.mjs
+# unit + endpoint + Vercel function tests (25 tests)
+cd contact && node --test tests/core.test.js tests/handler.test.mjs tests/vercel.test.mjs
 
 # browser tests (one-time: pip install playwright). PowerShell: $env:PW_CHANNEL='msedge'
 cd contact && python -X utf8 tests/ui_flow.py ../artifact/jein-site.html      # 78 checks
 cd contact && python -X utf8 tests/pages_flow.py ../artifact/jein-site.html   # 174 checks
-cd contact && python -X utf8 -I tests/build_flow.py ../site                     # 31 checks: multi-page build over HTTP
+cd contact && python -X utf8 -I tests/build_flow.py ../site                     # 32 checks: multi-page build over HTTP
 
 # deploy the contact Worker (after filling in wrangler.toml and setting secrets)
 cd contact/server && npx wrangler deploy
@@ -97,6 +102,11 @@ The Playwright tests check specific IDs, classes, counts and copy. Examples:
 If you change any of these, update the tests in the same change.
 
 Git: this folder is a local repository (branch `main`) with `core.autocrlf=false`, so the artifact keeps its LF line endings. Its remote `origin` is https://github.com/JElekwa/JEIN-WEBSITE.git.
+
+Hosting:
+- The live site is meant to run on **Vercel** at **https://jeinelekwa.com** (domain registered at Namecheap; DNS points to Vercel), deployed from GitHub `main`.
+- `SITE_URL` and `CONTACT_ENDPOINT='/api/contact'` are set in the build script, so always rebuild `site/` before committing artifact changes.
+- Secrets live only in Vercel environment variables. The repo is public.
 
 ---
 
