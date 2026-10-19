@@ -74,4 +74,14 @@ The page pushes these events to `window.dataLayer` and also dispatches them as a
 - `jein_contact_form_abandoned`
 - `jein_contact_submission_success`
 
+The rest of the site adds these anonymous events, through `trackSite()` in the first script:
+
+- `jein_project_view` (project slug and category)
+- `jein_episode_view`
+- `jein_outbound_click` (destination host only)
+- `jein_podcast_click`
+- `jein_community_join_click`
+- `jein_resume_click`
+- `jein_case_study_cta`
+
 Events never contain a name, email or message. No analytics tool is installed yet. Once Google Tag Manager or similar is on the page, these events flow into it automatically.

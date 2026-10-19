@@ -746,6 +746,34 @@ footer .foot-logo{height:64px}
 .guest{display:grid;gap:4px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
 .guest .mono{color:var(--plum);font-size:.64rem}
 
+/* Phase 3 (v0.7): filters, case-study endings, site search */
+.focus-6{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:860px){.focus-6{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.focus-6{grid-template-columns:1fr}}
+.focus-ways{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-top:28px}
+.focus-ways > .mono{color:var(--plum)}
+.facets{display:flex;flex-wrap:wrap;gap:10px 16px;margin-bottom:14px}
+.facet{display:inline-flex;align-items:center;gap:8px}
+.facet .mono{font-size:.64rem;color:var(--ink-2)}
+.facet select{font:inherit;font-size:.9rem;color:var(--ink);background:#fff;border:1.5px solid var(--rule);border-radius:99px;padding:8px 14px;min-height:42px;max-width:100%}
+.facet select:focus{outline:none;border-color:var(--plum);box-shadow:0 0 0 3px var(--plum-soft)}
+.cs-cta{display:flex;flex-wrap:wrap;gap:12px}
+.nav-search{display:inline-flex;align-items:center;gap:8px}
+.nav-search svg{width:18px;height:18px;flex-shrink:0}
+.nav-search-label{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:1120px){.nav-search-label{position:static!important;width:auto;height:auto;clip:auto}}
+.search-lg{width:min(100%,640px);font-size:1.1rem;min-height:54px;padding-inline:22px}
+.site-count{color:var(--ink-2);margin:16px 0 8px}
+.site-results{display:grid;gap:28px;max-width:860px}
+.sr-group h2{font-size:var(--step-1);margin-bottom:10px}
+.sr-group h2 .n{font-family:var(--mono);font-size:.72rem;color:var(--ink-2);font-weight:400}
+.sr-group ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.sr-group a{display:grid;gap:3px;padding:14px 16px;background:#fff;border:1px solid var(--rule);border-radius:var(--radius);text-decoration:none;color:var(--ink)}
+.sr-group a:hover,.sr-group a:focus-visible{border-color:var(--gold)}
+.sr-group a .mono{font-size:.62rem;color:var(--plum)}
+.sr-group a b{font-family:var(--display);font-weight:600;font-size:1rem}
+.sr-group a span:not(.mono){color:var(--ink-2);font-size:.92rem}
+
 /* ventures / programs / organizations strip */
 .orgs{padding-block:clamp(28px,4vw,44px);border-top:1px solid var(--rule);background:var(--paper)}
 .orgs-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px 24px;flex-wrap:wrap;margin-bottom:18px}
@@ -771,7 +799,7 @@ footer .foot-logo{height:64px}
 
 <a class="skip" href="#main">Skip to content</a>
 
-<div class="notice" id="notice">
+<div class="notice" id="notice" role="region" aria-label="Site status">
   <div class="wrap">
     <strong>BUILD 0.4 · CONTENT PENDING</strong>
     <p>Pages, What’s New, logo, scroll journey and guided contact are live. Articles from the J.E.I.N. hub, project photos and the remaining case-study details are still being added. Nothing on this page is a placeholder pretending to be real.</p>
@@ -793,12 +821,13 @@ footer .foot-logo{height:64px}
       <a href="#community" data-nav="community">Community</a>
       <a href="#whats-new" data-nav="whats-new" class="is-new">What’s New</a>
       <a href="#contact" data-nav="contact">Contact</a>
+      <a class="nav-search" href="#search" aria-label="Search the site" title="Search (press /)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span class="nav-search-label">Search</span></a>
       <a class="btn btn-primary head-cta" href="#projects">Explore Projects <span class="arr" aria-hidden="true">→</span></a>
     </nav>
   </div>
 </header>
 
-<nav class="rail" aria-label="Chapters">
+<nav class="rail" aria-label="Chapter shortcuts">
   <a href="#about" data-rail="about"><i></i><span>01 Starting point</span></a>
   <a href="#strategy" data-rail="strategy"><i></i><span>02 Business &amp; strategy</span></a>
   <a href="#technology" data-rail="technology"><i></i><span>03 Technology &amp; systems</span></a>
@@ -815,7 +844,7 @@ footer .foot-logo{height:64px}
 <section class="hero" id="home" aria-labelledby="hero-title">
   <div class="wrap">
     <div class="hero-copy">
-      <span class="ticker mono" aria-label="Business times technology times execution">
+      <span class="ticker mono"><span class="sr-only">Business times technology times execution</span>
         <span class="dot" aria-hidden="true"></span>
         <span aria-hidden="true"><b class="word">BUSINESS</b> <span class="x">×</span> <b class="word">TECHNOLOGY</b> <span class="x">×</span> <b class="word">EXECUTION</b></span>
       </span>
@@ -1129,6 +1158,35 @@ footer .foot-logo{height:64px}
 
 
 
+<!-- FOCUS AREAS (v0.7) — career positioning for recruiters, partners, clients and media alike -->
+<section class="chapter focus-areas" id="focus-areas" aria-labelledby="focus-title">
+  <div class="wrap">
+    <div class="sub-head">
+      <span class="mono">Focus areas · how I can help</span>
+      <h2 id="focus-title">Where business operations meet better systems</h2>
+      <p>I understand how businesses operate, identify opportunities to improve their systems and processes, and explore practical ways to use technology, analysis, automation, and structured implementation to create better outcomes.</p>
+    </div>
+    <div class="focus-grid focus-6">
+      <div><span class="mono">Analyse</span><h3>Business analysis</h3><p>Mapping processes and requirements before choosing a tool.</p></div>
+      <div><span class="mono">Change</span><h3>Business transformation</h3><p>Moving teams from manual workarounds to systems they trust.</p></div>
+      <div><span class="mono">Connect</span><h3>Technology-enabled systems</h3><p>Information systems that support how the business actually runs.</p></div>
+      <div><span class="mono">Improve</span><h3>Quality and process improvement</h3><p>Finding where value leaks and improving the process behind it.</p></div>
+      <div><span class="mono">Implement</span><h3>IT implementation</h3><p>Setting up, testing and supporting the tools teams depend on.</p></div>
+      <div><span class="mono">Operate</span><h3>E-commerce and operations</h3><p>Storefronts, sourcing and fulfilment, from listing to delivery.</p></div>
+    </div>
+    <div class="focus-ways">
+      <span class="mono">Ways to work together</span>
+      <ul class="link-list">
+        <li><a href="#connect-hire">Hiring for a role</a></li>
+        <li><a href="#connect-collaborate">Projects and consulting</a></li>
+        <li><a href="#connect-business">Business, e-commerce and partnerships</a></li>
+        <li><a href="#connect-media">Media and the O2O Playbook</a></li>
+      </ul>
+      <span data-resume></span>
+    </div>
+  </div>
+</section>
+
 <section class="wn-teaser" id="home-whats-new" aria-labelledby="wnt-title">
   <div class="wrap">
     <div class="wnt-head">
@@ -1378,6 +1436,11 @@ footer .foot-logo{height:64px}
       <label class="sr-only" for="proj-search">Search projects</label>
       <input class="search" id="proj-search" type="search" placeholder="Search by name, skill, category or keyword" autocomplete="off">
       <a class="jx-skip" href="#awards">Awards and Recognition →</a>
+    </div>
+    <div class="facets" role="group" aria-label="More filters">
+      <label class="facet" for="f-tech"><span class="mono">Technology</span><select id="f-tech"></select></label>
+      <label class="facet" for="f-status"><span class="mono">Status</span><select id="f-status"></select></label>
+      <label class="facet" for="f-year"><span class="mono">Year</span><select id="f-year"></select></label>
     </div>
     <div class="filters" role="group" aria-label="Filter projects by category" id="filters"></div>
     <div class="legend" aria-label="Status key">
@@ -1718,12 +1781,13 @@ footer .foot-logo{height:64px}
 <div class="page" data-page="privacy" hidden>
 <section class="privacy" id="privacy" aria-labelledby="privacy-title">
   <div class="wrap">
-    <span class="mono">Privacy notice · draft for review · updated 18 October 2026</span>
+    <span class="mono">Privacy notice · draft for review · updated 19 October 2026</span>
     <h2 id="privacy-title">How your contact details are used</h2>
     <div class="privacy-body">
       <div><h3>What I collect</h3><p>Only what you type into the introduction form: your name, role, organisation and industry if you give them, your topic and answers, your email address, and any LinkedIn or website link you add. No phone number is needed.</p></div>
       <div><h3>Why</h3><p>To read your message and reply to you about it. Your answers are not used for advertising, and you will not be added to any mailing list.</p></div>
-      <div><h3>Where it goes</h3><p>Submissions are stored by the platform hosting this site, sent to Joshua’s email inbox, and kept as a contact record in his CRM (HubSpot) so conversations can be followed up. Analytics, where enabled, only count steps and never receive your name, email or message.</p></div>
+      <div><h3>Where it goes</h3><p>Submissions are stored by the platform hosting this site, sent to Joshua’s email inbox, and kept as a contact record in his CRM (HubSpot) so conversations can be followed up.</p></div>
+      <div><h3>Anonymous site statistics</h3><p>The site can count anonymous events: contact-form steps, which project pages are opened, which outside links are followed, and clicks on podcast, community-join and résumé links. These events never include your name, email or message. No analytics tool is installed yet; if one is added, this notice will name it and say what it stores.</p></div>
       <div><h3>How long, and your choices</h3><p>Records are kept while a conversation is active and reviewed at least once a year. You can ask for your details to be corrected or deleted at any time by sending a new introduction with “Something else” and saying so.</p></div>
     </div>
   </div>
@@ -1743,6 +1807,21 @@ footer .foot-logo{height:64px}
       <p>These kinds of recognition will be listed once Joshua confirms the title, awarding organization and date.</p>
       <ul class="bg-list" data-award-slots></ul>
     </div>
+  </div>
+</section>
+</div>
+<div class="page" data-page="search" hidden>
+<section class="wn" id="search" aria-labelledby="search-title">
+  <div class="wrap">
+    <header class="wn-head">
+      <span class="mono">Search</span>
+      <h1 id="search-title">Search the site</h1>
+      <p>Projects and case studies, What’s New, O2O Playbook episodes and awards.</p>
+    </header>
+    <label class="sr-only" for="site-q">Search the site</label>
+    <input class="search search-lg" id="site-q" type="search" placeholder="Try “e-commerce”, “Enactus” or “automation”" autocomplete="off">
+    <p class="mono site-count" id="site-count" aria-live="polite"></p>
+    <div class="site-results" id="site-results"></div>
   </div>
 </section>
 </div>
@@ -1785,6 +1864,10 @@ footer .foot-logo{height:64px}
 
 <script>
 document.documentElement.classList.add('js');
+/* Multi-page hosting: scripts/build_standalone.py sets window.JEIN_MULTIPAGE = {base:'/', route:'about'} on each generated page
+   (/about/, /projects/<slug>/ …). The claude.ai artifact never sets it and keeps plain hash routes. */
+const MP = window.JEIN_MULTIPAGE || null;
+const currentHash = () => location.hash.slice(1) || (MP ? MP.route : '');
 
 /* ======================================================================================
    CONTENT — everything a person edits lives in this block. Layout code starts after it.
@@ -2005,6 +2088,9 @@ const PODCAST_LINKS = [
    newsletterUrl: optional signup page. events: [{title, date, desc, href}] — the section shows only when there are events. */
 const SFE = { joinUrl:'', newsletterUrl:'', events:[] };
 
+/* RÉSUMÉ — the download button on the home page stays hidden until BOTH a file address is set and approved is true. */
+const RESUME = { href:'', approved:false, label:'Download résumé (PDF)' };
+
 /* SOCIAL PROFILES — one source for the footer, contact page and What's New.
    An empty href is a slot: it never renders as a link. For email use href:'mailto:name@example.com'. */
 const SOCIALS = [
@@ -2116,8 +2202,21 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && nav.datase
 let activeCat = store.get('jein-filter') || 'all';
 if (!CATEGORIES.some(c=>c.id===activeCat)) activeCat = 'all';
 let query = '';
+const facet = { tech:'', status:'', year:'' };
+const yearOf = p => (p.dates && /\d{4}/.exec(p.dates.start || '') || [''])[0];
 const haystack = p => [p.name, p.summary, p.sub, catLabel(p.category), STATUS_LABEL[p.status], ...(p.tech||[]), ...(p.tags||[])].filter(Boolean).join(' ').toLowerCase();
-const matches = (p, q) => !q || q.toLowerCase().split(/\s+/).filter(Boolean).every(w => haystack(p).includes(w));
+const matchesQuery = (p, q) => !q || q.toLowerCase().split(/\s+/).filter(Boolean).every(w => haystack(p).includes(w));
+const matches = (p, q) => matchesQuery(p, q) && (!facet.tech || (p.tech || []).includes(facet.tech)) &&
+  (!facet.status || p.status === facet.status) && (!facet.year || yearOf(p) === facet.year);
+const anyFilter = () => query || facet.tech || facet.status || facet.year;
+function renderFacets(){
+  const opts = (id, all, values, label) => { const el = $(id); el.innerHTML = `<option value="">${all}</option>` +
+    values.map(v => `<option value="${esc(v)}"${facet[label] === v ? ' selected' : ''}>${esc(label === 'status' ? STATUS_LABEL[v] : v)}</option>`).join(''); };
+  opts('#f-tech', 'Any technology', [...new Set(PROJECTS.flatMap(p => p.tech || []))].sort(), 'tech');
+  opts('#f-status', 'Any status', Object.keys(STATUS_LABEL).filter(s => PROJECTS.some(p => p.status === s)), 'status');
+  opts('#f-year', 'Any year', [...new Set(PROJECTS.map(yearOf).filter(Boolean))].sort().reverse(), 'year');
+}
+['tech', 'status', 'year'].forEach(k => $('#f-' + k).addEventListener('change', e => { facet[k] = e.target.value; renderFilters(); renderGrid(); }));
 function renderFilters(){
   $('#filters').innerHTML = CATEGORIES.map(c => {
     const n = (c.id==='all' ? PROJECTS : PROJECTS.filter(p=>p.category===c.id)).filter(p => matches(p, query)).length;
@@ -2142,20 +2241,21 @@ function card(p){
 }
 function renderGrid(){
   const list = (activeCat==='all' ? PROJECTS : PROJECTS.filter(p=>p.category===activeCat)).filter(p => matches(p, query));
-  $('#result-count').textContent = `${list.length} ${list.length===1?'project':'projects'} · ${catLabel(activeCat)}${query ? ` · matching “${query}”` : ''}`;
-  $('#grid').innerHTML = list.length ? list.map(card).join('') : query ?
-    `<div class="empty" style="grid-column:1/-1"><b>No projects match “${esc(query)}”</b><span>Try another word, or clear the search.</span><button type="button" class="filter" data-clear-search>Clear search</button></div>` :
+  const extra = [facet.tech, facet.status && STATUS_LABEL[facet.status], facet.year].filter(Boolean);
+  $('#result-count').textContent = `${list.length} ${list.length===1?'project':'projects'} · ${catLabel(activeCat)}${extra.length ? ' · ' + extra.join(' · ') : ''}${query ? ` · matching “${query}”` : ''}`;
+  $('#grid').innerHTML = list.length ? list.map(card).join('') : anyFilter() ?
+    `<div class="empty" style="grid-column:1/-1"><b>No projects match ${query ? `“${esc(query)}”` : 'these filters'}</b><span>Try another word or filter, or clear them.</span><button type="button" class="filter" data-clear-search>Clear search and filters</button></div>` :
     `<div class="empty" style="grid-column:1/-1"><b>Nothing published here yet</b><span>Projects in ${esc(catLabel(activeCat))} will appear once they are documented.</span><button type="button" class="filter" data-cat="all">Show all projects</button></div>`;
 }
 document.addEventListener('click', e => {
-  if (e.target.closest('[data-clear-search]')){ query = ''; $('#proj-search').value = ''; renderFilters(); renderGrid(); $('#proj-search').focus(); return; }
+  if (e.target.closest('[data-clear-search]')){ query = ''; $('#proj-search').value = ''; facet.tech = facet.status = facet.year = ''; renderFacets(); renderFilters(); renderGrid(); $('#proj-search').focus(); return; }
   const b = e.target.closest('[data-cat]');
   if (!b) return;
   activeCat = b.dataset.cat; store.set('jein-filter', activeCat);
   renderFilters(); renderGrid();
 });
 $('#proj-search').addEventListener('input', e => { query = e.target.value.trim(); renderFilters(); renderGrid(); });
-renderFilters(); renderGrid();
+renderFacets(); renderFilters(); renderGrid();
 
 /* ---------- case studies (#p-slug) and episodes (#ep-slug) share the detail view ---------- */
 function crumbs(items){
@@ -2170,6 +2270,18 @@ function relatedFor(p){
   EPISODES.filter(e => (e.projects || []).includes(p.slug)).forEach(e => out.push({label: `Episode: ${e.title}`, href: '#ep-' + e.slug}));
   (p.related || []).forEach(r => out.push(r));
   return out;
+}
+/* closing call to action: which contact card to preselect for each category */
+const CTA_PATH = { business:'collaborate', ecommerce:'business', it:'collaborate', web:'collaborate', entrepreneurship:'collaborate', community:'community' };
+/* related projects: shared category, tags and technologies, plus parent/child links; best three */
+function relatedProjects(p){
+  const mine = new Set([...(p.tags || []), ...(p.tech || [])]);
+  const kids = new Set((p.children || []).map(c => c.slug).filter(Boolean));
+  return PROJECTS.filter(k => k.slug !== p.slug).map(k => {
+    let s = (k.category === p.category ? 2 : 0) + [...(k.tags || []), ...(k.tech || [])].filter(t => mine.has(t)).length;
+    if (k.parent === p.slug || p.parent === k.slug || kids.has(k.slug) || (p.parent && k.parent === p.parent)) s += 3;
+    return { k, s };
+  }).filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 3).map(x => x.k);
 }
 function renderDetail(p){
   const hidden = new Set(p.confidential || []);
@@ -2209,9 +2321,15 @@ function renderDetail(p){
   (p.links || []).forEach(l => links.push(`<li>${extLink(l)}</li>`));
   const linkTodos = [(p.githubSlot && !gh) ? todo('GitHub link to be added.', 'To add') : '', (p.designSlot && !design) ? todo('Design-portfolio link to be added.', 'To add') : ''].join('');
   if (links.length || linkTodos) parts.push(dsec('links', 'Links', (links.length ? `<ul class="bg-list">${links.join('')}</ul>` : '') + linkTodos));
+  const near = relatedProjects(p);
+  if (near.length) parts.push(dsec('related-projects', 'Related projects', `<ul class="children">${near.map(k => `<li class="child"><a href="#p-${k.slug}"><b>${esc(k.name)}</b><span>${esc(catLabel(k.category))}</span></a></li>`).join('')}</ul>`));
   const rel = relatedFor(p);
   if (rel.length) parts.push(dsec('related', 'Related articles and episodes', `<ul class="bg-list">${rel.map(r => `<li>${extLink(r)}</li>`).join('')}</ul>`));
   if (p.confidentialNote || hidden.size) parts.push(dsec('confidentiality', 'Confidentiality', `<p>${esc(p.confidentialNote || 'Some details of this project are not shown publicly.')}</p>`));
+  parts.push(dsec('next', 'Next steps', `<div class="cs-cta">
+      <a class="btn btn-primary" href="#connect-${CTA_PATH[p.category] || 'collaborate'}" data-cta="discuss">Discuss a similar project <span class="arr" aria-hidden="true">→</span></a>
+      <a class="btn btn-ghost" href="#projects" data-cat="${esc(p.category)}" data-cta="more">See more in ${esc(catLabel(p.category))}</a>
+    </div>`));
 
   const facts = [
     ['Status', statusChip(p)],
@@ -2260,7 +2378,7 @@ function renderEpisode(e){
     </div>`;
 }
 function route(){
-  const h = location.hash.slice(1);
+  const h = currentHash();
   const m = h.startsWith('p-') && projectBySlug(h.slice(2));
   const ep = !m && h.startsWith('ep-') && EPISODES.find(e => e.slug === h.slice(3));
   if (m || ep){
@@ -2368,7 +2486,53 @@ function renderSFE(){
   const ev = $('[data-sfe-events]');
   if (ev){ ev.hidden = !SFE.events.length; ev.querySelector('ul').innerHTML = SFE.events.map(x => `<li><span><b>${esc(x.title)}</b>${x.date ? ' · ' + esc(x.date) : ''}${x.desc ? ' — ' + esc(x.desc) : ''}${x.href ? ' ' + extLink({label:'Details', href:x.href}) : ''}</span></li>`).join(''); }
 }
-renderAwards(); renderExperience(); renderCommunityWork(); renderPlaybook(); renderSFE();
+function renderResume(){
+  const el = $('[data-resume]'); if (!el) return;
+  el.innerHTML = (RESUME.href && RESUME.approved) ? `<a class="btn btn-ghost" href="${esc(RESUME.href)}" target="_blank" rel="noopener" data-resume-link>${esc(RESUME.label)} <span class="arr" aria-hidden="true">↗</span></a>` : '';
+}
+renderAwards(); renderExperience(); renderCommunityWork(); renderPlaybook(); renderSFE(); renderResume();
+
+/* ---------- anonymous click events (no names, emails or message text; see the privacy notice) ---------- */
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href]'); if (!a) return;
+  if (a.hasAttribute('data-podcast-link')) trackSite('podcast_click', { platform: a.textContent.trim() });
+  else if (a.hasAttribute('data-community-join')) trackSite('community_join_click');
+  else if (a.hasAttribute('data-resume-link')) trackSite('resume_click');
+  if (a.dataset.cta) trackSite('case_study_cta', { cta: a.dataset.cta });
+  let u; try { u = new URL(a.href, location.href); } catch(err){ return; }
+  if (/^https?:$/.test(u.protocol) && u.host !== location.host) trackSite('outbound_click', { host: u.host });
+}, true);
+
+/* ---------- site-wide search (#search): projects, What's New, episodes, awards ---------- */
+const SEARCH_GROUPS = [
+  ['Projects', () => PROJECTS.map(p => ({ title: p.name, href: '#p-' + p.slug, meta: catLabel(p.category), text: p.summary,
+      hay: [p.name, p.summary, p.sub, catLabel(p.category), STATUS_LABEL[p.status], p.overview, ...(p.tags || []), ...(p.tech || []), ...(p.children || []).map(c => c.name)] }))],
+  ['What’s New', () => FEED.map(f => ({ title: f.title, href: f.href, external: f.external, meta: f.type, text: f.summary, hay: [f.title, f.summary, f.meta, f.type] }))],
+  ['O2O Playbook episodes', () => EPISODES.map(e => ({ title: e.title, href: '#ep-' + e.slug, meta: 'Episode' + (e.date ? ' · ' + e.date : ''), text: e.summary || '',
+      hay: [e.title, e.summary, ...(e.topics || []), ...(e.guests || []).map(g => g.name)] }))],
+  ['Awards and recognition', () => AWARDS.map(a => ({ title: a.title + (a.result ? ' · ' + a.result : ''), href: '#awards', meta: a.date || 'Award', text: a.desc, hay: [a.title, a.result, a.desc, a.org] }))]
+];
+function renderSiteSearch(q){
+  q = (q || '').trim();
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  const out = $('#site-results'), count = $('#site-count');
+  if (!words.length){ out.innerHTML = ''; count.textContent = 'Type to search'; return; }
+  let total = 0;
+  out.innerHTML = SEARCH_GROUPS.map(([label, get]) => {
+    const hits = get().filter(x => { const h = x.hay.filter(Boolean).join(' ').toLowerCase(); return words.every(w => h.includes(w)); });
+    total += hits.length;
+    return hits.length ? `<section class="sr-group"><h2>${label} <span class="n">${hits.length}</span></h2><ul>${hits.map(x =>
+      `<li><a href="${esc(x.href)}"${x.external ? ' target="_blank" rel="noopener"' : ''}><span class="mono">${esc(x.meta)}</span><b>${esc(x.title)}${x.external ? ' ↗' : ''}</b><span>${esc(x.text)}</span></a></li>`).join('')}</ul></section>` : '';
+  }).join('') || `<div class="empty"><b>Nothing matches “${esc(q)}”</b><span>Try a shorter or different word, such as a project name, a skill or a category.</span></div>`;
+  count.textContent = `${total} ${total === 1 ? 'result' : 'results'} for “${q}”`;
+}
+$('#site-q').addEventListener('input', e => renderSiteSearch(e.target.value));
+renderSiteSearch('');
+/* press "/" anywhere (outside a text field) to open search */
+document.addEventListener('keydown', e => {
+  if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input, textarea, select, [contenteditable]')) return;
+  e.preventDefault(); if (window.JEINRouter) window.JEINRouter.go('search'); else location.hash = 'search'; setTimeout(() => $('#site-q').focus(), 60);
+});
 
 /* ---------- active nav + chapter rail ---------- */
 const sectionToNav = {home:'home', about:'about', strategy:'about', technology:'about', projects:'projects', playbook:'playbook', community:'community', contact:'contact'};
@@ -3234,7 +3398,7 @@ if ('IntersectionObserver' in window){
 
   /* ---------- router: one page visible at a time ---------- */
   const ORDER = ['home','about','projects','playbook','community','whats-new','contact'];
-  const LABEL = { home:'Home', about:'About', projects:'Projects', playbook:'O2O Playbook', community:'Community', 'whats-new':'What’s New', contact:'Contact', privacy:'Privacy notice', awards:'Awards and Recognition', notfound:'Page not found' };
+  const LABEL = { home:'Home', about:'About', projects:'Projects', playbook:'O2O Playbook', community:'Community', 'whats-new':'What’s New', contact:'Contact', privacy:'Privacy notice', awards:'Awards and Recognition', search:'Search', notfound:'Page not found' };
   /* one natural, accurate description per page (set on <meta name="description"> when the page is shown) */
   const META = {
     home: 'J.E.I.N. — Joshua Elekwa Interactive Network. Business, technology, e-commerce and community projects, and how better systems and practical execution create value.',
@@ -3246,6 +3410,7 @@ if ('IntersectionObserver' in window){
     contact: 'Connect with Joshua Elekwa about roles, project collaboration, business and e-commerce, the O2O Playbook or the Seven Figure Employee community.',
     privacy: 'How the J.E.I.N. website uses the details you share through the contact form.',
     awards: 'Verified awards and recognition for Joshua Elekwa and the teams he has been part of, including Project Stoke and X-Culture 2020.',
+    search: 'Search the J.E.I.N. website: projects and case studies, What’s New, O2O Playbook episodes and awards.',
     notfound: 'This page could not be found on the J.E.I.N. website.'
   };
   const RELATED = {
@@ -3306,19 +3471,50 @@ if ('IntersectionObserver' in window){
       else if (changed) window.scrollTo({ top: 0, behavior: 'instant' });
       if (changed && host){
         const h = host.querySelector('h1, h2');
-        if (h && page !== 'home'){ h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+        if (page === 'search'){ const si = q('#site-q'); if (si) si.focus({ preventScroll: true }); }
+        else if (h && page !== 'home'){ h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
       }
       document.dispatchEvent(new CustomEvent('jein:page', { detail: { page } }));
     });
   }
   function route(){
-    const h = decodeURIComponent(location.hash.slice(1));
+    const h = decodeURIComponent(currentHash());
     const page = pageFor(h);
     if (page === null){ show(null); return; }
     if (q('#detail-view') && !q('#detail-view').hidden) return;  // case-study route restores the home view first
     show(page, h && page !== 'home' ? h : (h === 'home-whats-new' || h === 'journey' ? h : null));
   }
-  window.JEINRouter = { go(hash){ if (location.hash.slice(1) !== hash){ location.hash = hash; } route(); }, current: () => current };
+  /* multi-page mode: real paths for every page, case study and episode */
+  const PAGE_PATH = { home:'', about:'about/', projects:'projects/', playbook:'o2o-playbook/', community:'community/', 'whats-new':'whats-new/',
+    contact:'contact/', privacy:'privacy/', awards:'awards/', search:'search/', notfound:'404.html' };
+  function pathFor(hash){
+    const base = (MP && MP.base) || '/';
+    if (!hash || hash === 'home') return base;
+    if (hash.startsWith('p-')) return base + 'projects/' + hash.slice(2) + '/';
+    if (hash.startsWith('ep-')) return base + 'o2o-playbook/' + hash.slice(3) + '/';
+    const page = pageFor(hash);
+    if (!page || page === 'notfound') return null;
+    return base + PAGE_PATH[page] + (hash === page || (page === 'playbook' && hash === 'playbook') ? '' : '#' + hash);
+  }
+  window.JEINRouter = {
+    go(hash){
+      if (MP){ const to = pathFor(hash); if (to && to.split('#')[0] !== location.pathname){
+        setTimeout(() => { location.href = to; }, 250);   // lets the contact draft (saved after 200 ms) keep a card chosen on this page
+        return; } }
+      if (location.hash.slice(1) !== hash){ location.hash = hash; } route();
+    },
+    current: () => current, pageFor, pathFor
+  };
+  if (MP){
+    const rewrite = scope => scope.querySelectorAll && scope.querySelectorAll('a[href^="#"]').forEach(a => {
+      const hash = a.getAttribute('href').slice(1);
+      if (!hash || hash === 'main' || a.hasAttribute('data-jump')) return;
+      const to = pathFor(hash); if (to) a.setAttribute('href', to);
+    });
+    rewrite(document);
+    new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) rewrite(n.parentNode || n); })))
+      .observe(document.body, { childList: true, subtree: true });
+  }
   addEventListener('hashchange', () => setTimeout(route, 0));
 
   renderSocials(); renderFeeds();

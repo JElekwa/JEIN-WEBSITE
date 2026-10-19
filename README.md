@@ -7,7 +7,7 @@ The J.E.I.N. (Joshua Elekwa Interactive Network) site, packaged for Claude Deskt
 | Path | What it is |
 |---|---|
 | `artifact/jein-site.html` | **The source of truth.** The whole site in one file, exactly as published on claude.ai. Make all edits here. |
-| `site/index.html` | The deployable copy for a normal web host such as Namecheap. Generated from the artifact file; don't edit it by hand. |
+| `site/` | The deployable multi-page site for a normal web host such as Namecheap. Generated from the artifact file; don't edit it by hand (except adding images to `site/assets/`). |
 | `site/assets/` | Logo files: the mark, the full lockup, and a high-resolution PNG. |
 | `scripts/build_standalone.py` | Rebuilds `site/index.html` from the artifact file. |
 | `contact/` | The contact system: shared form logic, the serverless endpoint (HubSpot + email), tests, and its own README. |
@@ -16,8 +16,8 @@ The J.E.I.N. (Joshua Elekwa Interactive Network) site, packaged for Claude Deskt
 ## Day-to-day workflow
 
 1. Ask Claude to change `artifact/jein-site.html`.
-2. Run `python3 scripts/build_standalone.py` to refresh `site/index.html`.
-3. Open `site/index.html` in a browser to check it. Fonts load from Google Fonts, so you need to be online.
+2. Run `python3 scripts/build_standalone.py` to refresh `site/`.
+3. Open `site/index.html` in a browser for a quick look. Links between pages need a web server: `python3 -m http.server --directory site`, then visit http://localhost:8000. Fonts load from Google Fonts, so you need to be online.
 4. Optionally republish to claude.ai. The live artifact is https://claude.ai/artifact/4sWZbqan4mw3go3wQDHRdT. Ask Claude to publish `artifact/jein-site.html` to that URL, so the link and its stored contact submissions are kept.
 
 ## How to add content
@@ -59,11 +59,29 @@ The site is one file with hash-routed pages. That works on any static host, with
 
 ## Publishing on Namecheap
 
-1. Upload `site/index.html` and the `site/assets/` folder to `public_html` using cPanel File Manager or FTP. Turn on free SSL (AutoSSL) for the domain.
-2. In `scripts/build_standalone.py`, set `SITE_URL` to your domain and rebuild.
-3. **Contact form:** on Namecheap the claude.ai storage isn't available, so the form shows an honest "sending isn't available" message until an endpoint is connected. There are two ways to connect one:
-   - **Cloudflare Worker (ready now).** Deploy `contact/server` as described in `contact/README.md`, put the Worker URL in `CONTACT_ENDPOINT` in the build script, and rebuild. The domain can stay at Namecheap.
-   - **PHP on Namecheap hosting.** Not written yet. Ask Claude to port `contact/server/handler.mjs` to a PHP file if you'd rather keep everything on Namecheap.
+1. In `scripts/build_standalone.py`, set `SITE_URL` to your address (for example `https://jeinelekwa.com/`, with the trailing slash).
+2. Optional: set `SHARE_IMAGE_APPROVED = True` once you approve `docs/share-preview.png`, the image shown when the site is shared.
+3. Run `python3 scripts/build_standalone.py`. It writes the whole site into `site/`:
+   - A real page for every address: `/about/`, `/projects/`, `/projects/<project>/`, `/o2o-playbook/`, `/community/`, `/whats-new/`, `/contact/`, `/privacy/`, `/awards/`, `/search/` and `404.html`.
+   - `sitemap.xml` and `robots.txt`.
+   - `.htaccess`, which makes Apache show the branded 404 page.
+4. Upload **everything inside `site/`**, including the hidden `.htaccess` file, to `public_html` using cPanel File Manager or FTP. Turn on free SSL (AutoSSL).
+5. In Google Search Console, add the domain and submit `https://<your-domain>/sitemap.xml`.
+6. **Contact form:** on your own host the claude.ai storage isn't available. Until an endpoint is connected, the form shows an honest "sending isn't available" message. There are two ways to connect one:
+   - **Cloudflare Worker (ready now):** deploy `contact/server` as described in `contact/README.md`, put the Worker URL in `CONTACT_ENDPOINT`, and rebuild.
+   - **PHP on Namecheap hosting:** not written yet.
+
+The claude.ai artifact keeps working as before, as a single file with `#` addresses. Publish `artifact/jein-site.html` to the same artifact URL.
+
+## Analytics (not installed yet)
+
+The site already sends anonymous events to `window.dataLayer`: contact-form steps, project and episode views, outbound links, podcast, community-join, résumé and case-study button clicks. They never include names, emails or messages. The full list is in `contact/README.md`.
+
+Recommendation: **Plausible Analytics** (or the free **Cloudflare Web Analytics** if you only need page views).
+- Both are cookieless and don't track people across sites. Under Canadian privacy law (PIPEDA, and Québec's Law 25 for visitors there), the privacy notice is generally enough; no cookie banner is needed.
+- Plausible can record the `dataLayer` events as custom events with a few lines of glue code.
+- Google Analytics 4 via Tag Manager would read `dataLayer` directly. But it sets cookies, so you'd need a consent banner (Consent Mode) before it loads.
+- Whichever you choose, update the "Anonymous site statistics" paragraph of the privacy notice to name the tool.
 
 ## Contact delivery today (claude.ai version)
 
@@ -79,7 +97,8 @@ cd contact
 node --test tests/*.test.js tests/*.test.mjs          # form logic and endpoint (23 tests)
 pip install playwright && playwright install chromium   # one-time setup for the browser tests
 python3 tests/ui_flow.py ../artifact/jein-site.html     # contact flow (78 checks)
-python3 tests/pages_flow.py ../artifact/jein-site.html  # pages, links, 404, case studies, awards, O2O, mobile (153 checks)
+python3 tests/pages_flow.py ../artifact/jein-site.html  # pages, links, 404, case studies, search, analytics, mobile (174 checks)
+python3 tests/build_flow.py ../site                     # the multi-page build, served over HTTP (31 checks)
 ```
 
 On Windows:

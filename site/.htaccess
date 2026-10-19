@@ -1,0 +1,2 @@
+# Apache (Namecheap shared hosting): show the branded 404 page for unknown addresses
+ErrorDocument 404 /404.html

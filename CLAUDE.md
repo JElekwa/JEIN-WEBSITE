@@ -15,7 +15,7 @@ In practice:
 ## Source of truth and workflow
 
 - **Edit only `artifact/jein-site.html`.** It is the page exactly as published on claude.ai, so it has no `<html>`/`<head>`/`<body>` wrapper.
-- `site/index.html` is **generated** by `scripts/build_standalone.py`. Never hand-edit it.
+- Everything in `site/` except `site/assets/*.webp|png` is **generated** by `scripts/build_standalone.py`. Never hand-edit it. The build writes real pages (`/about/`, `/projects/<slug>/`, `/o2o-playbook/<slug>/`, …) and sets `window.JEIN_MULTIPAGE = {base, route}` on each one. In that mode the artifact reads the route from the page and rewrites internal `#links` to real paths (`pathFor` / `JEINRouter`). Shared CSS, JS and embedded images go to cached files in `site/assets/build/`. The artifact itself stays a single file with hash routes.
 - The contact rules (cards, topics, validation, email text, HubSpot mapping) live in `contact/shared/contact-core.js`. **The same code is pasted inline in the artifact** (the 3rd `<script>` block). If you change one, change the other identically. Today they are byte-identical.
 - The logo is embedded four times as a base64 WebP data URI: header, journey scene 1, About laptop art, and footer. Those lines are each about 26 KB. Avoid reading them whole, and don't re-encode the logo.
 - Live artifact: https://claude.ai/artifact/4sWZbqan4mw3go3wQDHRdT. Republish to that same URL so the link and its stored contact submissions are kept.
@@ -35,7 +35,7 @@ jein-website/
 │       ├── jein-lockup.webp        logo lockup
 │       └── jein-lockup-full.png    high-res lockup with "JOSHUA ELEKWA INTERACTIVE NETWORK"
 ├── scripts/
-│   └── build_standalone.py         artifact → site/index.html (sets SITE_URL, CONTACT_ENDPOINT)
+│   └── build_standalone.py         artifact → site/: real pages per route, sitemap, robots, .htaccess (SITE_URL, CONTACT_ENDPOINT, SHARE_IMAGE_APPROVED)
 ├── contact/
 │   ├── README.md                   delivery design, HubSpot field map, analytics events
 │   ├── package.json                npm scripts for tests / deploy
@@ -46,7 +46,8 @@ jein-website/
 │       ├── core.test.js            node:test, contact-core
 │       ├── handler.test.mjs        node:test, endpoint with mocked fetch/KV
 │       ├── ui_flow.py              Playwright, guided contact flow (78 checks)
-│       └── pages_flow.py           Playwright, routing / links / case studies / mobile (153 checks)
+│       ├── pages_flow.py           Playwright, routing / links / case studies / search / analytics / mobile (174 checks)
+│       └── build_flow.py           Playwright over a local HTTP server: the multi-page site/ build (31 checks)
 └── docs/
     ├── contact-relay.md            HubSpot custom properties + hourly relay task
     └── briefs/                     01 portfolio, 02 journey, 03 contact briefs + original logo photo
@@ -79,7 +80,8 @@ cd contact && node --test tests/core.test.js tests/handler.test.mjs
 
 # browser tests (one-time: pip install playwright). PowerShell: $env:PW_CHANNEL='msedge'
 cd contact && python -X utf8 tests/ui_flow.py ../artifact/jein-site.html      # 78 checks
-cd contact && python -X utf8 tests/pages_flow.py ../artifact/jein-site.html   # 153 checks
+cd contact && python -X utf8 tests/pages_flow.py ../artifact/jein-site.html   # 174 checks
+cd contact && python -X utf8 -I tests/build_flow.py ../site                     # 31 checks: multi-page build over HTTP
 
 # deploy the contact Worker (after filling in wrangler.toml and setting secrets)
 cd contact/server && npx wrangler deploy
@@ -217,13 +219,15 @@ Other type rules:
 
 | Page (`data-page`) | Hash | Sections |
 |---|---|---|
-| home | `#home` | **Hero**: ticker `BUSINESS × TECHNOLOGY × EXECUTION`, h1 "Business meets technology. Ideas become impact.", lede, 3 CTAs, mono meta row, Venn SVG (business / technology / execution → impact). **Scroll journey** `#journey`: 6 pinned, scroll-driven scenes on desktop (stacked on mobile or with reduced motion), chapter stops, parallax SVG layers, floating project cards in scene 04. **What's New teaser** `#home-whats-new`: 3 feed cards + social pills. |
+| home | `#home` | **Hero**: ticker `BUSINESS × TECHNOLOGY × EXECUTION`, h1 "Business meets technology. Ideas become impact.", lede, 3 CTAs, mono meta row, Venn SVG (business / technology / execution → impact). **Scroll journey** `#journey`: 6 pinned, scroll-driven scenes on desktop (stacked on mobile or with reduced motion), chapter stops, parallax SVG layers, floating project cards in scene 04. **Org strip** `#orgs`. **Focus areas** `#focus-areas`: the brand-positioning sentence, 6 focus cells (`.focus-grid.focus-6`), 4 "ways to work together" contact links, and a résumé button that stays hidden until `RESUME.href` is set and `approved` is true. **What's New teaser** `#home-whats-new`: 3 feed cards + social pills. |
 | about | `#about`, `#strategy`, `#technology`, `#about-more` | Ch 01 *The starting point* (5-paragraph narrative, Professional Background list, Appropedia source note, workspace SVG). After Ch 03: `#about-more` (gold tint), with How I Approach Problems (`#approach`), Current Learning and Development (`#learning`), Entrepreneurship and Independent Projects (`#ventures`), and Community and Volunteering (`#community-volunteering`, mirrored from `#community-list` on the Community page). Ch 02 *Business and strategy* (gold tint, focus grid, flow diagram + dashboard SVG). Ch 03 *Technology and systems* (focus grid, terminal card, network SVG). |
-| projects | `#projects` | Ch 04 (plum tint): category filters with counts, status key, result count, project grid (17 cards: 8 core + 9 from Appropedia). Categories, with ids kept stable: Business and Transformation (`business`), E-commerce and Commercial Ventures (`ecommerce`), Product, IT and Systems (`it`), Web, Design and Digital Marketing (`web`), Competitions and Business Case Studies (`entrepreneurship`), Community and Social Impact (`community`). Optional record fields: `image:{src,alt}` (16:9, falls back to the coloured cover) and `tech:[…]` (mono tags; confirmed technologies only). |
-| case study | `#p-<slug>` | Separate `#detail-view`: breadcrumbs (Home › Projects › Category › Project), hero, sticky table of contents, 8 sections (overview, problem, role, approach, deliverables, results, lessons, media), with "To add" for anything not supplied. An unknown slug shows the 404 page. |
+| projects | `#projects` | Ch 04 (plum tint): category filters with counts, status key, result count, project grid (22 cards). Search box, plus Technology / Status / Year selects, all combined with the category filters. Categories, with ids kept stable: Business and Transformation (`business`), E-commerce and Commercial Ventures (`ecommerce`), Product, IT and Systems (`it`), Web, Design and Digital Marketing (`web`), Competitions and Business Case Studies (`entrepreneurship`), Community and Social Impact (`community`). Optional record fields: `image:{src,alt}` (16:9, falls back to the coloured cover) and `tech:[…]` (mono tags; confirmed technologies only). |
+| case study | `#p-<slug>` | Separate `#detail-view`. Breadcrumbs (Home › Projects › Category › [Parent] › Project), then a hero with facts (status, category, dates, team, part of), tags and notes. The sticky table of contents is built from the sections rendered. Sections come from the project's template (`SECTION_SETS`), plus planned areas, children, figures awaiting confirmation, tools, images, links, related projects, related articles and episodes, confidentiality, and "Next steps" (Discuss a similar project → contact card preselected; See more in [category]). An unknown slug shows the 404 page. |
+| episode | `#ep-<slug>` | Same detail view: breadcrumbs, show notes, guests, listen links, related projects. |
+| search | `#search` | Site-wide search across projects, What's New, episodes and awards. The header has a search icon, and "/" opens it from any page. |
 | notfound | any unknown hash | Branded 404: outlined "404", h1, links to Home, Projects and Contact. |
-| playbook | `#playbook` | O2O Playbook (ink): intro, Online ⇄ Offline comparison, 4 format tiles ("0 published"), pitch-a-guest CTA. |
-| community | `#community`, `#seven-figure-employee` | Ch 05 (sage tint): impact list, people SVG. **Seven Figure Employee** panel: 4 pillars, "Register interest". |
+| playbook | `#playbook`, `#episodes` | O2O Playbook (ink): positioning line, Online ⇄ Offline comparison, 4 format tiles (the episode count is live), 10 topics, episode archive with topic filters and search (honest empty state), guest profiles, subscription links (shown only once real), and the pitch-a-guest CTA. |
+| community | `#community`, `#community-work`, `#seven-figure-employee` | Ch 05 (sage tint): impact list (`#community-list`), people SVG, involvement cards (`COMMUNITY_WORK`: type and outcome, "to confirm" where unverified). **Seven Figure Employee** panel: positioning line, a Join button that says "coming soon" until `SFE.joinUrl` is set, Register interest, 4 pillars, purpose, who it's for, topics, draft guidelines, and events (hidden while empty). |
 | whats-new | `#whats-new` | Header, 4 social cards (hub, LinkedIn, Facebook, Appropedia), filterable feed (Article / Case study / Profile). |
 | contact | `#contact`, `#connect`, `#connect-<path>` | Ch 06 (ink): Direction / Learning / Building strip, 4 audience cards. **Guided contact** `.cx` (cream panel): 6 connection cards → confirmation → step 1 (conversational introduction, topic, follow-ups) → step 2 (contact details, consent, live preview) → done state. |
 | privacy | `#privacy` | Draft privacy notice in a 2-column grid. |
