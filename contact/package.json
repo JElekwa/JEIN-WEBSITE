@@ -5,6 +5,7 @@
   "scripts": {
     "test": "node --test tests/core.test.js tests/handler.test.mjs tests/vercel.test.mjs",
     "test:ui": "python3 tests/ui_flow.py ../artifact/jein-site.html && python3 tests/pages_flow.py ../artifact/jein-site.html && python3 tests/build_flow.py ../site",
-    "deploy": "cd server && npx wrangler deploy"
+    "deploy": "cd server && npx wrangler deploy",
+    "test:articles": "python3 tests/test_articles_pipeline.py && python3 tests/articles_flow.py"
   }
 }

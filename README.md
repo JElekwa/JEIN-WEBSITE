@@ -57,6 +57,62 @@ The site is one file with hash-routed pages. That works on any static host, with
 | Contact with a card preselected | `#connect-hire`, `#connect-collaborate`, `#connect-business`, `#connect-media`, `#connect-community`, `#connect-other` |
 | Privacy | `#privacy` |
 
+## Publishing articles from Google Drive
+
+New articles go live without touching code or Vercel. Write them in Google Docs, move a finished one into the
+**Ready to publish** folder, and within about an hour it's on jeinelekwa.com. The hourly GitHub Action
+"Publish articles from Google Drive" does the rest: it converts the doc, rebuilds the site and commits, and Vercel
+deploys the push.
+
+### Writing an article
+- **Title:** the Google Doc's file name.
+- **Details (optional):** put them at the very top, one per line, then a line of three dashes:
+  ```
+  Summary: One or two sentences for cards, search and link previews.
+  Topics: E-commerce, Logistics
+  Date: 2026-11-03
+  Projects: last-mile-wholesale
+  ---
+  ```
+  - Without a summary, the first paragraph is used.
+  - Without a date, the doc's creation date is used.
+  - `Projects` takes case-study addresses (the part after `/projects/`).
+- **Body:**
+  - Use **Heading 1 / 2 / 3** for headings, normal text, bold, italic, links, bullet and numbered lists, tables and images.
+  - Give every image alt text: right-click the image → **Alt text**.
+  - Fonts, colours and sizes are ignored, so every article matches the site.
+- **What happens where:**
+  - The first image becomes the article's card and link-preview picture.
+  - The article appears first in **What's New**, on the home-page teaser, in site search and in the O2O Playbook article count.
+  - Each article gets its own page at `https://jeinelekwa.com/articles/<title>/`.
+
+### Publishing, editing and removing
+| To… | Do this in Google Drive |
+|---|---|
+| Publish | Move the finished doc from **Drafts** into **Ready to publish**. |
+| Fix or update | Edit the doc where it is. Changes go live on the next hourly run, and the address stays the same even if you rename it. |
+| Unpublish | Move the doc out of **Ready to publish**, for example back to Drafts. |
+| Publish right now | GitHub → **Actions** → **Publish articles from Google Drive** → **Run workflow**. |
+
+### One-time setup (about 15 minutes)
+1. **Google Drive:** create two folders, **Drafts** and **Ready to publish**. Open **Ready to publish** and copy its ID: the part of the address after `/folders/`.
+2. **Google Cloud** (console.cloud.google.com, signed in with the same Google account):
+   1. Create a project (for example `jein-site`).
+   2. Go to **APIs & Services → Library**, find **Google Drive API** and click **Enable**.
+   3. Go to **IAM & Admin → Service Accounts → Create service account**, name it `jein-publisher`, and skip the optional role steps.
+   4. Open the new service account and go to **Keys → Add key → Create new key → JSON**. A `.json` file downloads. Treat it like a password: don't email it or put it in the repository.
+   5. Copy the service account's email (`jein-publisher@…iam.gserviceaccount.com`).
+3. **Share the folder:** in Drive, share **Ready to publish** with that email as **Viewer**. The robot can only read this one folder.
+4. **GitHub** (github.com/JElekwa/JEIN-WEBSITE → **Settings → Secrets and variables → Actions**):
+   - **Secrets** tab → **New repository secret**: name `GDRIVE_SERVICE_ACCOUNT`, value = the whole contents of the JSON file.
+   - **Variables** tab → **New repository variable**: name `DRIVE_READY_FOLDER_ID`, value = the folder ID from step 1.
+   - Then delete the downloaded JSON file from your computer.
+5. **Test:** put a short test doc in **Ready to publish**, then go to **Actions → Publish articles from Google Drive → Run workflow**. When it finishes (about a minute), check jeinelekwa.com/whats-new/. Move the doc out and run it again to unpublish it.
+
+Good to know:
+- GitHub pauses scheduled jobs in a repository with no activity for 60 days. Every published article counts as activity. If it does pause, GitHub emails you and one click re-enables it.
+- The claude.ai artifact doesn't show articles; they live on jeinelekwa.com.
+
 ## Going live on Vercel (jeinelekwa.com)
 
 The repository is ready for Vercel:

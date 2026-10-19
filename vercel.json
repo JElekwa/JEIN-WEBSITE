@@ -5,15 +5,59 @@
   "buildCommand": "echo 'no build: serving the committed site/ folder'",
   "outputDirectory": "site",
   "redirects": [
-    { "source": "/:page(about|projects|o2o-playbook|community|whats-new|contact|privacy|awards|search)", "destination": "/:page/", "permanent": true },
-    { "source": "/projects/:slug([a-z0-9-]+)", "destination": "/projects/:slug/", "permanent": true },
-    { "source": "/o2o-playbook/:slug([a-z0-9-]+)", "destination": "/o2o-playbook/:slug/", "permanent": true }
+    {
+      "source": "/:page(about|projects|o2o-playbook|community|whats-new|contact|privacy|awards|search)",
+      "destination": "/:page/",
+      "permanent": true
+    },
+    {
+      "source": "/projects/:slug([a-z0-9-]+)",
+      "destination": "/projects/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/o2o-playbook/:slug([a-z0-9-]+)",
+      "destination": "/o2o-playbook/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/articles/:slug([a-z0-9-]+)",
+      "destination": "/articles/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/articles/",
+      "destination": "/whats-new/",
+      "permanent": false
+    },
+    {
+      "source": "/articles",
+      "destination": "/whats-new/",
+      "permanent": false
+    }
   ],
   "headers": [
-    { "source": "/assets/build/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
-    { "source": "/(.*)", "headers": [
-      { "key": "X-Content-Type-Options", "value": "nosniff" },
-      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
-    ] }
+    {
+      "source": "/assets/build/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
   ]
 }

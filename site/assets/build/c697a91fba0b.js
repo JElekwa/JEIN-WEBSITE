@@ -214,6 +214,12 @@ const COMMUNITY_WORK = [
     notes:['Show notes paragraph', '…'], guests:[{name:'…', role:'…', bio:'…', link:'https://…'}],
     links:[{label:'Listen on Spotify', href:'https://…'}], projects:['last-mile-wholesale']} */
 const EPISODES = [];
+
+/* ARTICLES — published automatically from the Google Drive "Ready to publish" folder (see README "Publishing
+   articles from Google Drive"). The GitHub Action writes content/articles/*.json and the build hands them to the
+   page as window.JEIN_ARTICLES, so don't edit articles here. Fields: slug, title, date ('YYYY-MM-DD'), summary,
+   topics:[…], projects:[slug…], cover:{src, alt}, readMinutes. The body is loaded only on the article's own page. */
+const ARTICLES = (window.JEIN_ARTICLES || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 const O2O_TOPICS = ['E-commerce','Business systems','IT','Automation','Digital marketing','Logistics','Operations','Quality and process improvement','Entrepreneurship','Business transformation'];
 /* Subscription links: each shows only once its href is filled in. */
 const PODCAST_LINKS = [
@@ -262,6 +268,9 @@ const FEED = [
   { type:'Profile', title:'Project portfolio on Appropedia', href: APPROPEDIA, external:true, cover:{bg:'#E9EDE2',fg:'#171717'}, meta:'appropedia.org',
     summary:'The full list of Joshua’s sustainability and social-impact projects, with links to partners.' }
 ];
+
+FEED.unshift(...ARTICLES.map(a => ({ type:'Article', title:a.title, href:'#a-' + a.slug, cover:{bg:'#F4EAD6',fg:'#171717'},
+  image: a.cover && a.cover.src, meta:[a.date, ...(a.topics || []).slice(0, 2)].filter(Boolean).join(' · '), summary:a.summary, cta:'Read the article' })));
 
 /* ORGANIZATIONS STRIP (home page) — relationship labels say only what the site verifies.
    logo: a supplied logo file as a data: URI or 'assets/…'; until then the tile shows initials in the site's style. */
@@ -516,15 +525,41 @@ function renderEpisode(e){
       ${projects.length ? dsec('projects', 'Related projects', `<ul class="bg-list">${projects.map(p => `<li><a href="#p-${p.slug}" style="color:var(--plum);font-weight:600">${esc(p.name)}</a></li>`).join('')}</ul>`) : ''}
     </div>`;
 }
+function renderArticle(a){
+  const body = (window.JEIN_ARTICLE_BODY && window.JEIN_ARTICLE_BODY.slug === a.slug) ? window.JEIN_ARTICLE_BODY.html : (a.body || '');
+  const projects = (a.projects || []).map(projectBySlug).filter(Boolean);
+  const meta = ['Article', a.date ? new Date(a.date + 'T12:00:00').toLocaleDateString('en-CA', { year:'numeric', month:'long', day:'numeric' }) : '', a.readMinutes ? a.readMinutes + ' min read' : ''].filter(Boolean).join(' · ');
+  $('#detail-root').innerHTML = `
+    ${crumbs([{label:'Home', href:'#home'}, {label:'What’s New', href:'#whats-new'}, {label: a.title}])}
+    <article class="article">
+      <header class="detail-hero">
+        <span class="mono" style="color:var(--plum)">${esc(meta)}</span>
+        <h1>${esc(a.title)}</h1>
+        ${a.summary ? `<p class="detail-lede">${esc(a.summary)}</p>` : ''}
+        ${tagList(a.topics, 'Topics')}
+        ${a.cover && a.cover.src && !body.includes(a.cover.src) ? `<div class="detail-shot"><img src="${esc(a.cover.src)}" alt="${esc(a.cover.alt || '')}" width="1280" height="720"></div>` : ''}
+      </header>
+      <div class="article-body">${body || todo('The full article opens on its own page on jeinelekwa.com.', 'Read online')}</div>
+    </article>
+    <div class="detail-sections article-after">
+      ${projects.length ? dsec('related-projects', 'Related projects', `<ul class="children">${projects.map(k => `<li class="child"><a href="#p-${k.slug}"><b>${esc(k.name)}</b><span>${esc(catLabel(k.category))}</span></a></li>`).join('')}</ul>`) : ''}
+      ${dsec('next', 'Keep reading', `<div class="cs-cta"><a class="btn btn-primary" href="#whats-new">More from What’s New <span class="arr" aria-hidden="true">→</span></a><a class="btn btn-ghost" href="#connect">Start a conversation</a></div>`)}
+    </div>`;
+}
 function route(){
   const h = currentHash();
   const m = h.startsWith('p-') && projectBySlug(h.slice(2));
   const ep = !m && h.startsWith('ep-') && EPISODES.find(e => e.slug === h.slice(3));
-  if (m || ep){
+  const art = !m && !ep && h.startsWith('a-') && ARTICLES.find(a => a.slug === h.slice(2));
+  if (m || ep || art){
     if (m){
       renderDetail(m);
       setMeta(m.name + ' · J.E.I.N.', `${m.name} — case study by Joshua Elekwa (${catLabel(m.category)}). ${m.summary}`);
       trackSite('project_view', { project: m.slug, category: m.category });
+    } else if (art){
+      renderArticle(art);
+      setMeta(art.title + ' · J.E.I.N.', art.summary || `An article by Joshua Elekwa: ${art.title}.`);
+      trackSite('article_view', { article: art.slug });
     } else {
       renderEpisode(ep);
       setMeta(ep.title + ' · O2O Playbook · J.E.I.N.', ep.summary || `O2O Playbook episode: ${ep.title}.`);
@@ -591,6 +626,8 @@ let epTopic = 'All', epQuery = '';
 function renderPlaybook(){
   const topics = $('[data-o2o-topics]');
   if (topics) topics.innerHTML = O2O_TOPICS.map(t => `<li>${esc(t)}</li>`).join('');
+  const ac = $('[data-count="articles"]');
+  if (ac) ac.textContent = `${ARTICLES.length} published`;
   const count = $('[data-count="episodes"]');
   if (count) count.textContent = `${EPISODES.length} published`;
   const fb = $('#ep-filters');

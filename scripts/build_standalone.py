@@ -9,6 +9,7 @@ Writes site/                     real pages with readable addresses for any stat
          projects/index.html     /projects/               projects/<slug>/        one page per case study
          o2o-playbook/index.html /o2o-playbook/           o2o-playbook/<slug>/    one page per published episode
          community/  whats-new/  contact/  privacy/  awards/  search/
+         articles/<slug>/        one page per article published from Google Drive (content/articles/*.json)
          404.html  sitemap.xml  robots.txt  .htaccess (Apache: 404 page)
 
 Every page is the same site with its own <title>, description, canonical URL and share tags, so search
@@ -16,12 +17,12 @@ engines and link previews see the right page. Inside the browser the site works 
 
 Edit the artifact file (or ask Claude to), then re-run this script before uploading the whole site/ folder.
 """
-import json, pathlib, re, shutil
+import json, os, pathlib, re, shutil
 from urllib.parse import urlparse
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / 'artifact' / 'jein-site.html'
-OUT = ROOT / 'site'
+OUT = pathlib.Path(os.environ.get('JEIN_SITE_OUT') or ROOT / 'site')   # override only used by tests
 
 CONTACT_ENDPOINT = '/api/contact'   # the Vercel function in api/contact.mjs (same site, so no CORS); a Worker URL also works
 SITE_URL = 'https://jeinelekwa.com/'   # your public address, ending in "/"; used for canonical URLs, sitemap and share tags
@@ -31,7 +32,8 @@ SHARE_IMAGE_APPROVED = True    # approved by Joshua on 19 October 2026; docs/sha
 PAGES = {'home': '', 'about': 'about/', 'projects': 'projects/', 'playbook': 'o2o-playbook/', 'community': 'community/',
          'whats-new': 'whats-new/', 'contact': 'contact/', 'privacy': 'privacy/', 'awards': 'awards/', 'search': 'search/'}
 NOINDEX = {'search'}
-GENERATED = [d.rstrip('/') for d in PAGES.values() if d] + ['404.html', 'sitemap.xml', 'robots.txt', '.htaccess']
+GENERATED = [d.rstrip('/') for d in PAGES.values() if d] + ['articles', 'assets/articles', '404.html', 'sitemap.xml', 'robots.txt', '.htaccess']
+ARTICLES_DIR = pathlib.Path(os.environ.get('JEIN_ARTICLES_DIR') or ROOT / 'content' / 'articles')   # written by scripts/sync_drive.py (GitHub Action)
 
 page = SRC.read_text(encoding='utf-8')
 base_path = urlparse(SITE_URL).path or '/'
@@ -100,6 +102,18 @@ head_part += f'\n<link rel="stylesheet" href="{asset(css.encode("utf-8"), "css")
 body_part = re.sub(r'<script>(.*?)</script>',
                    lambda m: f'<script src="{asset(m.group(1).encode("utf-8"), "js")}"></script>', body_part, flags=re.S)
 
+# articles published from Google Drive: metadata goes to every page, each body only to its own page
+ARTICLES = []
+for p in sorted(ARTICLES_DIR.glob('*.json')) if ARTICLES_DIR.exists() else []:
+    a = json.loads(p.read_text(encoding='utf-8'))
+    a['body_html'] = a.get('body_html', '').replace('@ASSETS@/', base_path + 'assets/')
+    if a.get('cover') and a['cover'].get('src'):
+        a['cover']['src'] = a['cover']['src'].replace('@ASSETS@/', base_path + 'assets/')
+    ARTICLES.append(a)
+ARTICLES.sort(key=lambda a: a.get('date', ''), reverse=True)
+ARTICLE_META = [{k: a[k] for k in ('slug', 'title', 'date', 'summary', 'topics', 'projects', 'cover', 'readMinutes') if a.get(k)} for a in ARTICLES]
+articles_script = f'<script>window.JEIN_ARTICLES = {json.dumps(ARTICLE_META, ensure_ascii=False)};</script>\n' if ARTICLES else ''
+
 config = f'<script>window.JEIN_CONTACT_ENDPOINT = {CONTACT_ENDPOINT!r};</script>\n' if CONTACT_ENDPOINT else ''
 share_url = SITE_URL + 'assets/share.png' if SHARE_IMAGE_APPROVED else ''
 SAME_AS = ['https://ca.linkedin.com/in/joshuaelekwa', 'https://www.facebook.com/JoshuaJEIN/',
@@ -110,21 +124,23 @@ def esc(s):
     return s.replace('&', '&amp;').replace('"', '&quot;').replace('<', '&lt;').replace('>', '&gt;')
 
 
-def doc(route, path, title, description, noindex=False, structured=()):
+def doc(route, path, title, description, noindex=False, structured=(), extra='', og_type='website', image=''):
     url = SITE_URL + path.lstrip('/') if path else SITE_URL
     ld = ''.join(f'<script type="application/ld+json">{json.dumps(x, ensure_ascii=False)}</script>\n' for x in structured)
     tags = [
         f'<title>{esc(title)}</title>',
         f'<meta name="description" content="{esc(description)}">',
         f'<link rel="canonical" href="{esc(url)}">',
-        '<meta property="og:type" content="website">',
+        f'<meta property="og:type" content="{og_type}">',
         '<meta property="og:site_name" content="J.E.I.N.">',
         f'<meta property="og:title" content="{esc(title)}">',
         f'<meta property="og:description" content="{esc(description)}">',
         f'<meta property="og:url" content="{esc(url)}">',
         f'<meta name="twitter:card" content="{"summary_large_image" if share_url else "summary"}">',
     ]
-    if share_url:
+    if image:
+        tags += [f'<meta property="og:image" content="{esc(image)}">', '<meta name="twitter:card" content="summary_large_image">']
+    elif share_url:
         tags += [f'<meta property="og:image" content="{share_url}">', '<meta property="og:image:width" content="1200">',
                  '<meta property="og:image:height" content="630">',
                  '<meta property="og:image:alt" content="J.E.I.N. — Joshua Elekwa Interactive Network logo">']
@@ -141,7 +157,7 @@ def doc(route, path, title, description, noindex=False, structured=()):
 <style>[hidden]{{display:none!important}} img{{max-width:100%}} body{{margin:0}}</style>
 {head_part.strip()}
 <script>window.JEIN_MULTIPAGE = {mp};</script>
-{config}{ld}</head>
+{articles_script}{extra}{config}{ld}</head>
 <body>
 {body_part.strip()}
 </body>
@@ -185,6 +201,23 @@ for slug, name, summary in PROJECTS:
 for slug, title in EPISODES:
     write(f'o2o-playbook/{slug}/', doc('ep-' + slug, f'o2o-playbook/{slug}/', f'{title} · O2O Playbook · J.E.I.N.', f'O2O Playbook episode: {title}.'))
 
+for a in ARTICLES:
+    url = SITE_URL + f"articles/{a['slug']}/"
+    cover = a.get('cover', {}).get('src', '')
+    cover_abs = (SITE_URL.rstrip('/') + cover) if cover.startswith('/') else cover
+    ld = {'@context': 'https://schema.org', '@type': 'Article', 'headline': a['title'], 'datePublished': a.get('date', ''),
+          'dateModified': (a.get('modified') or a.get('date', ''))[:10], 'author': {'@type': 'Person', 'name': 'Joshua Elekwa', 'url': SITE_URL},
+          'publisher': {'@type': 'Person', 'name': 'Joshua Elekwa'}, 'mainEntityOfPage': url, 'description': a.get('summary', '')}
+    if cover_abs:
+        ld['image'] = cover_abs
+    body = '<script>window.JEIN_ARTICLE_BODY = ' + json.dumps({'slug': a['slug'], 'html': a['body_html']}, ensure_ascii=False).replace('</', '<\\/') + ';</script>\n'
+    write(f"articles/{a['slug']}/", doc('a-' + a['slug'], f"articles/{a['slug']}/", f"{a['title']} · J.E.I.N.",
+          a.get('summary') or f"An article by Joshua Elekwa: {a['title']}.", structured=(ld,), extra=body, og_type='article', image=cover_abs))
+
+# article images: content/articles/img/<slug>/… → site/assets/articles/<slug>/…
+if (ARTICLES_DIR / 'img').exists():
+    shutil.copytree(ARTICLES_DIR / 'img', OUT / 'assets' / 'articles')
+
 write('404.html', doc('not-found', '404.html', 'Page not found · J.E.I.N.', META['notfound'], noindex=True), in_sitemap=False)
 
 (OUT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -203,6 +236,7 @@ if 'YOUR-DOMAIN' in SITE_URL:
     notes.append('SITE_URL is still the placeholder; set it before uploading')
 if not SHARE_IMAGE_APPROVED:
     notes.append('share image not approved yet; pages have no og:image')
+print(f'Articles: {len(ARTICLES)}')
 print(f'Wrote {len(pages_written)} pages to site/ ({size} KB each), sitemap.xml ({len(sitemap)} URLs), robots.txt, .htaccess')
 for n in notes:
     print(' - ' + n)

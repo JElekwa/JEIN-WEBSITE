@@ -108,6 +108,8 @@
     if (!hash || hash === 'home' || hash === 'main') return 'home';
     if (hash.startsWith('p-'))                                    // project detail (handled by the case-study view)
       return (typeof PROJECTS !== 'undefined' && PROJECTS.some(p => p.slug === hash.slice(2))) ? null : 'notfound';
+    if (hash.startsWith('a-'))                                    // article page (same detail view)
+      return (typeof ARTICLES !== 'undefined' && ARTICLES.some(a => a.slug === hash.slice(2))) ? null : 'notfound';
     if (hash.startsWith('ep-'))                                   // O2O episode page (same detail view)
       return (typeof EPISODES !== 'undefined' && EPISODES.some(e => e.slug === hash.slice(3))) ? null : 'notfound';
     if (/^connect(-[a-z]+)?$/.test(hash)) return 'contact';
@@ -157,6 +159,7 @@
     if (!hash || hash === 'home') return base;
     if (hash.startsWith('p-')) return base + 'projects/' + hash.slice(2) + '/';
     if (hash.startsWith('ep-')) return base + 'o2o-playbook/' + hash.slice(3) + '/';
+    if (hash.startsWith('a-')) return base + 'articles/' + hash.slice(2) + '/';
     const page = pageFor(hash);
     if (!page || page === 'notfound') return null;
     return base + PAGE_PATH[page] + (hash === page || (page === 'playbook' && hash === 'playbook') ? '' : '#' + hash);

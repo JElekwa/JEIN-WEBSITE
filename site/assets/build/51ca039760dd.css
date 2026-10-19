@@ -768,6 +768,26 @@ footer .foot-logo{height:64px}
 .sr-group a b{font-family:var(--display);font-weight:600;font-size:1rem}
 .sr-group a span:not(.mono){color:var(--ink-2);font-size:.92rem}
 
+.article .detail-hero{max-width:860px}
+.article-body{display:grid;gap:18px;max-width:68ch;padding-bottom:clamp(28px,4vw,48px);font-size:var(--step-0);line-height:1.7}
+.article-body > *{margin:0;min-width:0}
+.article-body h2{font-size:var(--step-2);font-weight:800;margin-top:14px}
+.article-body h3{font-size:var(--step-1);margin-top:8px}
+.article-body h4{font-family:var(--body);font-size:1.05rem;font-weight:600}
+.article-body a{color:var(--plum);font-weight:600;text-decoration-color:var(--gold);text-underline-offset:3px}
+.article-body ul,.article-body ol{padding-left:1.3em;display:grid;gap:6px}
+.article-body li::marker{color:var(--gold)}
+.article-body blockquote{border-left:3px solid var(--gold);padding-left:16px;color:var(--ink-2)}
+.article-body figure{display:grid;gap:8px}
+.article-body img{border-radius:var(--radius);border:1px solid var(--rule);max-width:100%;height:auto}
+.article-body figcaption{font-size:.86rem;color:var(--ink-2)}
+.article-body hr{border:0;border-top:1px solid var(--rule)}
+.article-body .table-wrap{overflow-x:auto}
+.article-body table{border-collapse:collapse;font-size:.94rem;min-width:100%}
+.article-body th,.article-body td{border:1px solid var(--rule);padding:8px 10px;text-align:left;vertical-align:top}
+.article-body th{background:var(--paper-2);font-weight:600}
+.article-after{max-width:68ch}
+
 /* ventures / programs / organizations strip */
 .orgs{padding-block:clamp(28px,4vw,44px);border-top:1px solid var(--rule);background:var(--paper)}
 .orgs-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px 24px;flex-wrap:wrap;margin-bottom:18px}

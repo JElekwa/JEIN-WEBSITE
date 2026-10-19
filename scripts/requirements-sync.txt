@@ -1,0 +1,5 @@
+# Used by scripts/sync_drive.py in the "Publish articles from Google Drive" GitHub Action
+google-api-python-client==2.149.0
+google-auth==2.35.0
+beautifulsoup4==4.12.3
+Pillow==10.4.0
