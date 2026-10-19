@@ -1,0 +1,21 @@
+# Cloudflare Worker for the J.E.I.N. contact endpoint.
+# Deploy:  npx wrangler deploy   (from this folder)
+# Secrets (never put these in this file):
+#   npx wrangler secret put HUBSPOT_TOKEN
+#   npx wrangler secret put RESEND_API_KEY
+#   npx wrangler secret put TURNSTILE_SECRET      # optional
+name = "jein-contact"
+main = "handler.mjs"
+compatibility_date = "2026-09-01"
+
+[vars]
+HUBSPOT_PORTAL_ID = "247730038"
+HUBSPOT_APP_HOST  = "app-na2.hubspot.com"
+OWNER_EMAIL       = "jein.inc@gmail.com"
+EMAIL_FROM        = "J.E.I.N. Website <contact@YOUR-VERIFIED-DOMAIN>"   # must be a Resend-verified domain
+ALLOWED_ORIGINS   = "https://YOUR-SITE-DOMAIN"
+
+# Rate limits + idempotency. Create with: npx wrangler kv namespace create JEIN_CONTACT
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_NAMESPACE_ID"
