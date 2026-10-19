@@ -96,7 +96,7 @@ The Playwright tests check specific IDs, classes, counts and copy. Examples:
 
 If you change any of these, update the tests in the same change.
 
-Git: this folder is a local repository (branch `main`) with `core.autocrlf=false`, so the artifact keeps its LF line endings. It has no remote yet.
+Git: this folder is a local repository (branch `main`) with `core.autocrlf=false`, so the artifact keeps its LF line endings. Its remote `origin` is https://github.com/JElekwa/JEIN-WEBSITE.git.
 
 ---
 
