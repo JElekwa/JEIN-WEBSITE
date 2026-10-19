@@ -324,8 +324,11 @@ const $ = s => document.querySelector(s);
 const store = {get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
 /* notice */
-if (store.get('jein-notice') === 'hidden') $('#notice').hidden = true;
-$('#notice-close').addEventListener('click', () => { $('#notice').hidden = true; store.set('jein-notice','hidden'); });
+/* status notice: the development "build" bar was removed for the live site; this keeps working if one is added back */
+if ($('#notice')){
+  if (store.get('jein-notice') === 'hidden') $('#notice').hidden = true;
+  $('#notice-close').addEventListener('click', () => { $('#notice').hidden = true; store.set('jein-notice','hidden'); });
+}
 
 /* mobile menu */
 const nav = $('#nav'), menuBtn = $('#menu-btn');
