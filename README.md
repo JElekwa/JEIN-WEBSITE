@@ -60,7 +60,7 @@ The site is one file with hash-routed pages. That works on any static host, with
 ## Publishing on Namecheap
 
 1. In `scripts/build_standalone.py`, set `SITE_URL` to your address (for example `https://jeinelekwa.com/`, with the trailing slash).
-2. Optional: set `SHARE_IMAGE_APPROVED = True` once you approve `docs/share-preview.png`, the image shown when the site is shared.
+2. The share image (`docs/share-preview.png`, approved) is published as `assets/share.png` and used for link previews on every page.
 3. Run `python3 scripts/build_standalone.py`. It writes the whole site into `site/`:
    - A real page for every address: `/about/`, `/projects/`, `/projects/<project>/`, `/o2o-playbook/`, `/community/`, `/whats-new/`, `/contact/`, `/privacy/`, `/awards/`, `/search/` and `404.html`.
    - `sitemap.xml` and `robots.txt`.

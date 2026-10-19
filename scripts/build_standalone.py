@@ -25,7 +25,7 @@ OUT = ROOT / 'site'
 
 CONTACT_ENDPOINT = ''          # e.g. 'https://jein-contact.<your-subdomain>.workers.dev/api/contact'
 SITE_URL = 'https://YOUR-DOMAIN.com/'   # your public address, ending in "/"; used for canonical URLs, sitemap and share tags
-SHARE_IMAGE_APPROVED = False   # set True once Joshua approves docs/share-preview.png; it is then published as assets/share.png
+SHARE_IMAGE_APPROVED = True    # approved by Joshua on 19 October 2026; docs/share-preview.png is published as assets/share.png
 
 # page key (as in the artifact router) -> folder
 PAGES = {'home': '', 'about': 'about/', 'projects': 'projects/', 'playbook': 'o2o-playbook/', 'community': 'community/',
