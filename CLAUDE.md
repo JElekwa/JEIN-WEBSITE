@@ -46,7 +46,7 @@ jein-website/
 │       ├── core.test.js            node:test, contact-core
 │       ├── handler.test.mjs        node:test, endpoint with mocked fetch/KV
 │       ├── ui_flow.py              Playwright, guided contact flow (78 checks)
-│       └── pages_flow.py           Playwright, routing / links / mobile overflow (66 checks)
+│       └── pages_flow.py           Playwright, routing / links / case studies / mobile (153 checks)
 └── docs/
     ├── contact-relay.md            HubSpot custom properties + hourly relay task
     └── briefs/                     01 portfolio, 02 journey, 03 contact briefs + original logo photo
@@ -79,7 +79,7 @@ cd contact && node --test tests/core.test.js tests/handler.test.mjs
 
 # browser tests (one-time: pip install playwright). PowerShell: $env:PW_CHANNEL='msedge'
 cd contact && python -X utf8 tests/ui_flow.py ../artifact/jein-site.html      # 78 checks
-cd contact && python -X utf8 tests/pages_flow.py ../artifact/jein-site.html   # 101 checks
+cd contact && python -X utf8 tests/pages_flow.py ../artifact/jein-site.html   # 153 checks
 
 # deploy the contact Worker (after filling in wrangler.toml and setting secrets)
 cd contact/server && npx wrangler deploy
@@ -87,7 +87,7 @@ cd contact/server && npx wrangler deploy
 
 The Playwright tests check specific IDs, classes, counts and copy. Examples:
 - `#cx-next` and `.wn-item`
-- 17 project cards and 7 nav links
+- 22 project cards and 7 nav links
 - "Step 1 of 2"
 - The What's New teaser showing 3 items
 - The category labels and the hero button labels
@@ -227,19 +227,29 @@ Other type rules:
 | whats-new | `#whats-new` | Header, 4 social cards (hub, LinkedIn, Facebook, Appropedia), filterable feed (Article / Case study / Profile). |
 | contact | `#contact`, `#connect`, `#connect-<path>` | Ch 06 (ink): Direction / Learning / Building strip, 4 audience cards. **Guided contact** `.cx` (cream panel): 6 connection cards → confirmation → step 1 (conversational introduction, topic, follow-ups) → step 2 (contact details, consent, live preview) → done state. |
 | privacy | `#privacy` | Draft privacy notice in a 2-column grid. |
+| awards | `#awards` | Awards and Recognition (gold tint): verified `AWARDS` cards (team results credited to the team) plus labelled "to add" slots. It is linked from About, Projects and the footer, and is not in the header nav. |
 
 Footer (ink, all pages): logo on a paper chip, tagline, 4 social icons, and Pages / Chapters / More link columns. Copyright line: "© 2026 Joshua Elekwa · J.E.I.N."
 
 ### Script blocks inside the artifact (in order)
 
-1. Core: `CATEGORIES`, `PROJECTS` (6 core), `DETAIL_SECTIONS`, notice, mobile menu, portfolio filters and grid, case-study router.
+1. Core:
+   - **CONTENT block**: `CATEGORIES`, `STATUS_LABEL`, `PROJECTS` (all 22), `AWARDS` / `AWARD_SLOTS`, `EXPERIENCE` / `EXPERIENCE_SLOTS`, `COMMUNITY_WORK`, `EPISODES`, `O2O_TOPICS`, `PODCAST_LINKS`, `SFE`, `SOCIALS`, `FEED` and `ORGS`. Each has a field comment above it.
+   - Then the layout code:
+     - `SECTION_SETS`: case-study templates `standard`, `competition`, `automation`, `collection` and `lab`.
+     - Portfolio filters plus search.
+     - `renderDetail` / `renderEpisode` and the detail router (`#p-` / `#ep-`).
+     - Renderers for awards, experience, community work, the Playbook and Seven Figure Employee.
+     - `trackSite()` for anonymous `dataLayer` events.
 2. Scroll journey (v0.2): pinning, scene switching, parallax, floating cards.
 3. `JEINContact` core (identical to `contact/shared/contact-core.js`).
 4. Guided contact (v0.3): UI state, localStorage draft, analytics events to `dataLayer`, delivery via `window.claude` page store or `window.JEIN_CONTACT_ENDPOINT`.
-5. Pages (v0.4): `SOCIALS`, `ADDED` Appropedia projects (pushed into `PROJECTS`), What's New `FEED`, page router (`window.JEINRouter`), generated `.pg-nav`.
+5. Pages (v0.4): social and feed renderers, page router (`window.JEINRouter`), `LABEL` / `META` / `RELATED`, generated `.pg-nav`. The data it renders now lives in the CONTENT block.
+6. v0.5: portrait (`PORTRAITS` data URIs) and the org-strip renderer.
 
-Data to edit content:
-- `PROJECTS` / `ADDED` (projects)
+Data to edit content (all in the CONTENT block; see README "How to add content"):
+- `PROJECTS` (projects; fields documented in the comment above the array). Empty fields are hidden, fields in `pending` show "To confirm", and `unconfirmed` holds facts awaiting approval.
+- `AWARDS`, `EXPERIENCE`, `COMMUNITY_WORK`, `EPISODES`, `PODCAST_LINKS`, `SFE`, `ORGS`
 - `FEED` (What's New)
 - `SOCIALS` (social links): email, GitHub and design-portfolio slots have an empty `href` and render only as "coming soon" on the contact page until a real URL is filled in.
 - `META` in the v0.4 script (per-page descriptions)

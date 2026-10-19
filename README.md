@@ -20,6 +20,23 @@ The J.E.I.N. (Joshua Elekwa Interactive Network) site, packaged for Claude Deskt
 3. Open `site/index.html` in a browser to check it. Fonts load from Google Fonts, so you need to be online.
 4. Optionally republish to claude.ai. The live artifact is https://claude.ai/artifact/4sWZbqan4mw3go3wQDHRdT. Ask Claude to publish `artifact/jein-site.html` to that URL, so the link and its stored contact submissions are kept.
 
+## How to add content
+
+Everything you edit lives in one place: the **CONTENT** block at the top of the first `<script>` in `artifact/jein-site.html`. Search for `CONTENT — everything a person edits`. You never touch layout code.
+
+To add an entry:
+1. Find the right array: `PROJECTS`, `FEED` (What's New), `EPISODES` (O2O Playbook), `AWARDS`, `EXPERIENCE`, `COMMUNITY_WORK`, `SOCIALS`, `ORGS` (the home-page strip) or `SFE` (the Seven Figure Employee join link and events).
+2. Copy one existing `{ … }` entry, paste it below the last one, and change the values. Keep the comma between entries.
+3. Run `python3 scripts/build_standalone.py`, then check the page.
+
+The honesty rules are built in:
+- A field you leave out is hidden.
+- A field named in `pending:[…]` shows as "To confirm".
+- Facts awaiting your approval go in `unconfirmed:[…]` and are labelled "To confirm".
+- A link with an empty `href` never renders as a link.
+
+Each array has a comment above it listing its fields. `EPISODES` includes a full example to copy.
+
 ## Pages
 
 The site is one file with hash-routed pages. That works on any static host, with no server setup.
@@ -31,7 +48,9 @@ The site is one file with hash-routed pages. That works on any static host, with
 | Projects (filterable portfolio) | `#projects` |
 | Page not found (any unknown address) | e.g. `#no-such-page` |
 | A project's case study | `#p-<slug>` |
-| O2O Playbook | `#playbook` |
+| Awards and Recognition | `#awards` |
+| O2O Playbook (topics, episode archive, guests) | `#playbook`, `#episodes` |
+| An O2O episode (once published) | `#ep-<slug>` |
 | Community | `#community` |
 | What's New | `#whats-new` |
 | Contact (two-step guided form) | `#contact`, `#connect` |
@@ -60,7 +79,7 @@ cd contact
 node --test tests/*.test.js tests/*.test.mjs          # form logic and endpoint (23 tests)
 pip install playwright && playwright install chromium   # one-time setup for the browser tests
 python3 tests/ui_flow.py ../artifact/jein-site.html     # contact flow (78 checks)
-python3 tests/pages_flow.py ../artifact/jein-site.html  # pages, links, 404, meta, mobile (101 checks)
+python3 tests/pages_flow.py ../artifact/jein-site.html  # pages, links, 404, case studies, awards, O2O, mobile (153 checks)
 ```
 
 On Windows:
