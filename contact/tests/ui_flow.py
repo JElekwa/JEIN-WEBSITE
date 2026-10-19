@@ -57,7 +57,8 @@ def step1(pg, role='Recruiter or hiring manager', name='Jordan Lee', company='Ex
 with sync_playwright() as p:
     import os
     _exe = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
-    b = p.chromium.launch(executable_path=_exe) if os.path.exists(_exe) else p.chromium.launch()
+    _ch = os.environ.get('PW_CHANNEL')  # e.g. PW_CHANNEL=msedge to use the installed Edge instead of a downloaded Chromium
+    b = p.chromium.launch(channel=_ch) if _ch else p.chromium.launch(executable_path=_exe) if os.path.exists(_exe) else p.chromium.launch()
 
     # 1. all six cards: confirmation, path-specific topics and follow-ups on one step, then reply + send
     paths = ['hire', 'collaborate', 'business', 'media', 'community', 'other']
@@ -103,6 +104,7 @@ with sync_playwright() as p:
     pg.click('#cx-back')
     check('back keeps answers', pg.input_value('#cx-roleOther') == 'Operations lead' and pg.input_value('#cx-fu-link') == 'example.com/job')
     pg.click('#cx-next')
+    pg.wait_for_timeout(5000)  # respect the minimum fill time, otherwise Send answers "That was quick" before validating
     pg.fill('#cx-email', 'jordan@'); pg.click('#cx-next'); pg.wait_for_timeout(200)
     check('invalid email rejected', 'name@example.com' in pg.inner_text('#err-email'))
     pg.fill('#cx-email', 'jordan@example.com'); pg.check('#cx-rm-linkedin', force=True); pg.click('#cx-next'); pg.wait_for_timeout(200)

@@ -29,6 +29,7 @@ The site is one file with hash-routed pages. That works on any static host, with
 | Home (hero, scroll journey, What's New teaser) | `#home` |
 | About (chapters 01–03) | `#about`, `#strategy`, `#technology` |
 | Projects (filterable portfolio) | `#projects` |
+| Page not found (any unknown address) | e.g. `#no-such-page` |
 | A project's case study | `#p-<slug>` |
 | O2O Playbook | `#playbook` |
 | Community | `#community` |
@@ -59,8 +60,12 @@ cd contact
 node --test tests/*.test.js tests/*.test.mjs          # form logic and endpoint (23 tests)
 pip install playwright && playwright install chromium   # one-time setup for the browser tests
 python3 tests/ui_flow.py ../artifact/jein-site.html     # contact flow (78 checks)
-python3 tests/pages_flow.py ../artifact/jein-site.html  # pages and links (66 checks)
+python3 tests/pages_flow.py ../artifact/jein-site.html  # pages, links, 404, meta, mobile (101 checks)
 ```
+
+On Windows:
+- Use `python -X utf8` instead of `python3`.
+- To test with the installed Microsoft Edge instead of a downloaded Chromium, set `PW_CHANNEL=msedge` first. In PowerShell: `$env:PW_CHANNEL='msedge'`.
 
 ## Still to do
 

@@ -54,7 +54,19 @@ jein-website/
 
 ## Commands
 
-Run these from the `jein-website/` folder. **Neither Node.js nor Python is installed on this machine yet.** The `python` command on PATH is only the Microsoft Store stub. Install Node 20+ and Python 3.10+ first. On Windows, use `python` where the README says `python3`.
+Run these from the `jein-website/` folder (`C:\Users\Work\Documents\jein-website`).
+
+Installed on this machine:
+- Node 24
+- Python 3.12 with Playwright
+- Git
+- GitHub CLI
+- Microsoft Edge, used for the browser tests
+
+On Windows:
+- Use `python` where the README says `python3`.
+- Run the browser tests with `-X utf8`, because the scripts read the file with the system encoding.
+- Set `PW_CHANNEL=msedge`. The Playwright Chromium download stalls on this network, so the tests drive the installed Edge instead.
 
 ```bash
 # rebuild the deployable site after editing the artifact
@@ -65,15 +77,24 @@ python scripts/build_standalone.py
 # unit + endpoint tests (23 tests)
 cd contact && node --test tests/core.test.js tests/handler.test.mjs
 
-# browser tests (one-time: pip install playwright && playwright install chromium)
-cd contact && python tests/ui_flow.py ../artifact/jein-site.html
-cd contact && python tests/pages_flow.py ../artifact/jein-site.html
+# browser tests (one-time: pip install playwright). PowerShell: $env:PW_CHANNEL='msedge'
+cd contact && python -X utf8 tests/ui_flow.py ../artifact/jein-site.html      # 78 checks
+cd contact && python -X utf8 tests/pages_flow.py ../artifact/jein-site.html   # 101 checks
 
 # deploy the contact Worker (after filling in wrangler.toml and setting secrets)
 cd contact/server && npx wrangler deploy
 ```
 
-The Playwright tests check specific IDs, classes, counts and copy. Examples: `#cx-next`, `.wn-item`, 15 project cards, 7 nav links, "Step 1 of 2", and the What's New teaser showing 3 items. If you change any of these, update the tests in the same change.
+The Playwright tests check specific IDs, classes, counts and copy. Examples:
+- `#cx-next` and `.wn-item`
+- 17 project cards and 7 nav links
+- "Step 1 of 2"
+- The What's New teaser showing 3 items
+- The category labels and the hero button labels
+
+If you change any of these, update the tests in the same change.
+
+Git: this folder is a local repository (branch `main`) with `core.autocrlf=false`, so the artifact keeps its LF line endings. It has no remote yet.
 
 ---
 
@@ -172,7 +193,20 @@ Other type rules:
   | pending | gold hatch |
 
 - **Illustrations:** inline SVG only, drawn in the palette, with JetBrains Mono labels. Data art is labelled "ILLUSTRATIVE". No stock photos.
-- **"To add" placeholders:** `.todo` (gold-soft, dashed gold border) and `.empty` (dashed rule box).
+- **"To add" placeholders:** `.todo` (gold-soft, dashed gold border, usable anywhere since v0.5), `.tbc` (small inline dashed "to confirm" label) and `.empty` (dashed rule box).
+- **v0.5 additions:**
+  - `.sub-head` (section eyebrow + h2 without a chapter number), `.about-grid` / `.about-block`, `.steps` (numbered mono list), `.link-list` (plum-soft link pills), `.tech-tags`, `.crumbs`, `.soc-pill.is-soon`, `.nf` (404).
+  - All of them reuse existing tokens.
+  - `.nav a[aria-current="page"]` was added so the current page is highlighted. The old rule targeted `"true"`, which the router never sets.
+  - The footer logo is the full lockup at 64px tall.
+  - **Portrait** `[data-portrait]` (hero, bottom-left of the Venn art; About ch 01 above the workspace art):
+    - A rotating conic ring in the brand palette, a dashed gold orbit with plum, terracotta and sage dots, and pointer tilt.
+    - Pressing it (click, tap or Enter) crossfades between Joshua's two supplied photos.
+    - The photos are embedded once, as data URIs in `PORTRAITS` in the last script block. Their sources are in `site/assets/portrait-*.webp`, with originals in `docs/photos/`.
+  - **Org strip** `#orgs` (home, between the hero and the journey):
+    - Tiles come from `ORGS` in the last script block, with the name, a relationship label, a link and an initials mark.
+    - Set `logo` once a real logo file is supplied.
+    - The strip scrolls as a marquee, pausing on hover or focus. With reduced motion it becomes a static wrapped grid.
 - **Page-to-page nav** `.pg-nav`: generated at the bottom of every page. It has prev/next cards and plum-soft "related" pills.
 - **Motion:**
   - Subtle effects: float, drift, pulse, rise, packet-flow dashes, spin, blink, card entrance, page fade.
@@ -184,9 +218,10 @@ Other type rules:
 | Page (`data-page`) | Hash | Sections |
 |---|---|---|
 | home | `#home` | **Hero**: ticker `BUSINESS × TECHNOLOGY × EXECUTION`, h1 "Business meets technology. Ideas become impact.", lede, 3 CTAs, mono meta row, Venn SVG (business / technology / execution → impact). **Scroll journey** `#journey`: 6 pinned, scroll-driven scenes on desktop (stacked on mobile or with reduced motion), chapter stops, parallax SVG layers, floating project cards in scene 04. **What's New teaser** `#home-whats-new`: 3 feed cards + social pills. |
-| about | `#about`, `#strategy`, `#technology` | Ch 01 *The starting point* (background list, Appropedia source note, workspace SVG). Ch 02 *Business and strategy* (gold tint, focus grid, flow diagram + dashboard SVG). Ch 03 *Technology and systems* (focus grid, terminal card, network SVG). |
-| projects | `#projects` | Ch 04 (plum tint): category filters with counts, status key, result count, project grid (15 cards: 6 core ventures + 9 from Appropedia). |
-| case study | `#p-<slug>` | Separate `#detail-view`: back link, hero, sticky table of contents, 8 sections (overview, problem, role, approach, deliverables, results, lessons, media), with "To add" for anything not supplied. |
+| about | `#about`, `#strategy`, `#technology`, `#about-more` | Ch 01 *The starting point* (5-paragraph narrative, Professional Background list, Appropedia source note, workspace SVG). After Ch 03: `#about-more` (gold tint), with How I Approach Problems (`#approach`), Current Learning and Development (`#learning`), Entrepreneurship and Independent Projects (`#ventures`), and Community and Volunteering (`#community-volunteering`, mirrored from `#community-list` on the Community page). Ch 02 *Business and strategy* (gold tint, focus grid, flow diagram + dashboard SVG). Ch 03 *Technology and systems* (focus grid, terminal card, network SVG). |
+| projects | `#projects` | Ch 04 (plum tint): category filters with counts, status key, result count, project grid (17 cards: 8 core + 9 from Appropedia). Categories, with ids kept stable: Business and Transformation (`business`), E-commerce and Commercial Ventures (`ecommerce`), Product, IT and Systems (`it`), Web, Design and Digital Marketing (`web`), Competitions and Business Case Studies (`entrepreneurship`), Community and Social Impact (`community`). Optional record fields: `image:{src,alt}` (16:9, falls back to the coloured cover) and `tech:[…]` (mono tags; confirmed technologies only). |
+| case study | `#p-<slug>` | Separate `#detail-view`: breadcrumbs (Home › Projects › Category › Project), hero, sticky table of contents, 8 sections (overview, problem, role, approach, deliverables, results, lessons, media), with "To add" for anything not supplied. An unknown slug shows the 404 page. |
+| notfound | any unknown hash | Branded 404: outlined "404", h1, links to Home, Projects and Contact. |
 | playbook | `#playbook` | O2O Playbook (ink): intro, Online ⇄ Offline comparison, 4 format tiles ("0 published"), pitch-a-guest CTA. |
 | community | `#community`, `#seven-figure-employee` | Ch 05 (sage tint): impact list, people SVG. **Seven Figure Employee** panel: 4 pillars, "Register interest". |
 | whats-new | `#whats-new` | Header, 4 social cards (hub, LinkedIn, Facebook, Appropedia), filterable feed (Article / Case study / Profile). |
@@ -203,4 +238,11 @@ Footer (ink, all pages): logo on a paper chip, tagline, 4 social icons, and Page
 4. Guided contact (v0.3): UI state, localStorage draft, analytics events to `dataLayer`, delivery via `window.claude` page store or `window.JEIN_CONTACT_ENDPOINT`.
 5. Pages (v0.4): `SOCIALS`, `ADDED` Appropedia projects (pushed into `PROJECTS`), What's New `FEED`, page router (`window.JEINRouter`), generated `.pg-nav`.
 
-Data to edit content: `PROJECTS` / `ADDED` (projects), `FEED` (What's New), `SOCIALS` (social links), `PATHS` in contact-core (contact cards, topics, follow-ups).
+Data to edit content:
+- `PROJECTS` / `ADDED` (projects)
+- `FEED` (What's New)
+- `SOCIALS` (social links): email, GitHub and design-portfolio slots have an empty `href` and render only as "coming soon" on the contact page until a real URL is filled in.
+- `META` in the v0.4 script (per-page descriptions)
+- `PATHS` in contact-core (contact cards, topics, follow-ups)
+
+Each page sets its own `<title>` and description through `setMeta()`.
